@@ -1,5 +1,9 @@
 package model
 
+//
+// Student
+//  @Description: 学生
+//
 type Student struct {
 	Model
 	Name                       string `gorm:"column:name;type:varchar(30);not null;default:'未命名';comment:昵称;unique" json:"name"`
@@ -20,6 +24,13 @@ type Student struct {
 	Status                     int8   `gorm:"column:status;type:tinyint(1);not null;default:0;comment:上线状态" json:"status"`
 }
 
+//
+// ExistStudentByNameAndPassword
+//  @Description: 通过昵称和密码判断学生是否存在
+//  @param name 昵称
+//  @param password 密码
+//  @return bool
+//
 func ExistStudentByNameAndPassword(name string, password string) bool {
 	var student Student
 	if err := db.Where(&Student{Name: name, Password: password}).First(&student).Error; err != nil {
@@ -28,6 +39,12 @@ func ExistStudentByNameAndPassword(name string, password string) bool {
 	return true
 }
 
+//
+// ExistStudentByName
+//  @Description: 通过昵称判断学生是否存在
+//  @param name 昵称
+//  @return bool
+//
 func ExistStudentByName(name string) bool {
 	var student Student
 	if err := db.Where(&Student{Name: name}).First(&student).Error; err != nil {
@@ -36,10 +53,20 @@ func ExistStudentByName(name string) bool {
 	return true
 }
 
+//
+// AddStudent
+//  @Description: 待删除
+//  @param student
+//
 func AddStudent(student *Student) {
 	db.Create(student)
 }
 
+//
+// ListStudent
+//  @Description: 待删除
+//  @return []Student
+//
 func ListStudent() []Student {
 	var students []Student
 	db.Find(&students)

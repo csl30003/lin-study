@@ -1,5 +1,9 @@
 package model
 
+//
+// Classroom
+//  @Description: 教室
+//
 type Classroom struct {
 	Model
 	Floor  string `gorm:"column:floor;type:varchar(20);default:'';comment:楼;index:seek" json:"floor"`

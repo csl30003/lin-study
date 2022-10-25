@@ -1,5 +1,9 @@
 package model
 
+//
+// Friend
+//  @Description: 朋友
+//
 type Friend struct {
 	Model
 	StudentId uint `gorm:"column:student_id;not null;comment:学生id" json:"student_id"`

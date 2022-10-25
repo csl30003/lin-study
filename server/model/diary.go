@@ -1,5 +1,9 @@
 package model
 
+//
+// Diary
+//  @Description: 日记
+//
 type Diary struct {
 	Model
 	StudentId    uint   `gorm:"column:student_id;not null;comment:学生id" json:"student_id"`

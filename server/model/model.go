@@ -10,6 +10,10 @@ import (
 	"time"
 )
 
+//
+// Model
+//  @Description: 固定属性
+//
 type Model struct {
 	ID        uint       `gorm:"primary_key" json:"id"`
 	CreatedAt time.Time  `json:"created_at"`
@@ -17,12 +21,18 @@ type Model struct {
 	DeletedAt *time.Time `sql:"index" json:"deleted_at"`
 }
 
+//  数据库实例
 var db *gorm.DB
 
+//
+// init
+//  @Description: MySQL初始化
+//
 func init() {
 	var err error
 
-	cfg, err := ini.Load("../config/dev/config.ini")
+	//  读取配置文件
+	cfg, err := ini.Load("./config/dev/config.ini")
 	if err != nil {
 		fmt.Println("文件读取失败", err)
 		os.Exit(1)
@@ -35,11 +45,13 @@ func init() {
 
 	dsn := user + ":" + password + "@tcp(" + host + ":" + port + ")/" + database + "?charset=utf8mb4&parseTime=True&loc=Local"
 
+	//  连接MySQL
 	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal("Failed to init db", err)
 	}
-	db.AutoMigrate(
+
+	err = db.AutoMigrate(
 		&Student{},
 		&Diary{},
 		&Friend{},
@@ -50,4 +62,8 @@ func init() {
 		&Classroom{},
 		&CollectClassroom{},
 	)
+	if err != nil {
+		log.Println("数据库表初始化失败")
+		return
+	}
 }

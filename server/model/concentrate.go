@@ -1,5 +1,9 @@
 package model
 
+//
+// Concentrate
+//  @Description: 专注
+//
 type Concentrate struct {
 	Model
 	StudentId           uint   `gorm:"column:student_id;not null;comment:学生id" json:"student_id"`

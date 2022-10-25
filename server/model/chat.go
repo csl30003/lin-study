@@ -1,5 +1,9 @@
 package model
 
+//
+// Chat
+//  @Description: 聊天
+//
 type Chat struct {
 	Model
 	SendId      uint   `gorm:"column:send_id;not null;comment:发送者id" json:"send_id"`
