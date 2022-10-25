@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"server/api"
+	"server/middleware"
 	"time"
 )
 
@@ -32,8 +33,12 @@ func Start() {
 
 	e.POST("/login", api.Login)
 	e.POST("/register", api.Register)
-	e.GET("/logout", api.Logout)
-	e.GET("/getStudentInfo", api.GetStudentInfo)
+
+	i := e.Group("/index", middleware.JWT())
+	{
+		i.GET("/logout", api.Logout)
+		i.GET("/getStudentInfo", api.GetStudentInfo)
+	}
 
 	e.GET("/student", api.ListStudent)
 	e.POST("/student", api.AddStudent)

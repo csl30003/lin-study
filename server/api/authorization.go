@@ -5,22 +5,12 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"server/config"
+	"server/middleware"
 	"server/model"
 	"server/response"
 	"time"
 )
-
-var jwtKey = []byte("my_secret_key")
-
-//
-// Claims
-//  @Description: JWT返回的JSON
-//
-type Claims struct {
-	ID   uint   `json:"id"`
-	Name string `json:"name"`
-	jwt.StandardClaims
-}
 
 //
 // Login
@@ -41,9 +31,9 @@ func Login(c *gin.Context) {
 	}
 
 	//  过期时间
-	expirationTime := time.Now().Add(24 * time.Hour)
+	expirationTime := time.Now().Add(12 * time.Hour)
 	//  创建JWT声明
-	claims := &Claims{
+	claims := &middleware.Claims{
 		ID:   student.ID,
 		Name: student.Name,
 		StandardClaims: jwt.StandardClaims{
@@ -52,6 +42,8 @@ func Login(c *gin.Context) {
 	}
 	//  使用用于签名的算法和令牌
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	jwtKey := []byte(config.Cfg.Section("JWT").Key("secret_key").String())
 	//  创建JWT字符串
 	tokenString, err := token.SignedString(jwtKey)
 	if err != nil {
@@ -101,7 +93,9 @@ func Logout(c *gin.Context) {
 		Name:   "token",
 		Value:  "",
 		MaxAge: -1,
+		Path:   "/",
 	})
+
 	response.Success(c, "退出登录成功", nil)
 }
 
@@ -111,36 +105,7 @@ func Logout(c *gin.Context) {
 //  @param c 上下文
 //
 func GetStudentInfo(c *gin.Context) {
-	//  获取Cookie
-	ck, err := c.Request.Cookie("token")
-	if err != nil {
-		if err == http.ErrNoCookie {
-			// 没有设置Cookie
-			response.Failed(c, "未授权")
-			return
-		}
-		response.Failed(c, "未知错误")
-		return
-	}
-
-	tokenString := ck.Value
-	claims := &Claims{}
-	//  解析JWT字符串并吧结果存储在claims中
-	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-		return jwtKey, nil
-	})
-	if err != nil {
-		if err == jwt.ErrSignatureInvalid {
-			response.Failed(c, "未授权")
-			return
-		}
-		response.Failed(c, "未知错误")
-		return
-	}
-	if !token.Valid {
-		response.Failed(c, "未授权")
-		return
-	}
+	claims, _ := c.Get("claims")
 
 	response.Success(c, "获取学生信息成功", claims)
 }

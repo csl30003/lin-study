@@ -1,12 +1,10 @@
 package model
 
 import (
-	"fmt"
-	"gopkg.in/ini.v1"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"log"
-	"os"
+	"server/config"
 	"time"
 )
 
@@ -31,17 +29,11 @@ var db *gorm.DB
 func init() {
 	var err error
 
-	//  读取配置文件
-	cfg, err := ini.Load("./config/dev/config.ini")
-	if err != nil {
-		fmt.Println("文件读取失败", err)
-		os.Exit(1)
-	}
-	host := cfg.Section("MYSQL").Key("host").String()
-	port := cfg.Section("MYSQL").Key("port").String()
-	user := cfg.Section("MYSQL").Key("user").String()
-	password := cfg.Section("MYSQL").Key("password").String()
-	database := cfg.Section("MYSQL").Key("database").String()
+	host := config.Cfg.Section("MYSQL").Key("host").String()
+	port := config.Cfg.Section("MYSQL").Key("port").String()
+	user := config.Cfg.Section("MYSQL").Key("user").String()
+	password := config.Cfg.Section("MYSQL").Key("password").String()
+	database := config.Cfg.Section("MYSQL").Key("database").String()
 
 	dsn := user + ":" + password + "@tcp(" + host + ":" + port + ")/" + database + "?charset=utf8mb4&parseTime=True&loc=Local"
 
