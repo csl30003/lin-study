@@ -15,7 +15,7 @@ import (
 //
 // Login
 //  @Description: 登录
-//  @param c
+//  @param c 上下文
 //
 func Login(c *gin.Context) {
 	var student model.Student
@@ -64,7 +64,7 @@ func Login(c *gin.Context) {
 //
 // Register
 //  @Description: 注册
-//  @param c
+//  @param c 上下文
 //
 func Register(c *gin.Context) {
 	var student model.Student
@@ -86,7 +86,7 @@ func Register(c *gin.Context) {
 //
 // Logout
 //  @Description: 退出登录
-//  @param c
+//  @param c 上下文
 //
 func Logout(c *gin.Context) {
 	http.SetCookie(c.Writer, &http.Cookie{

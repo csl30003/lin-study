@@ -38,10 +38,11 @@ func Start() {
 	{
 		i.GET("/logout", api.Logout)
 		i.GET("/getStudentInfo", api.GetStudentInfo)
-	}
 
-	e.GET("/student", api.ListStudent)
-	e.POST("/student", api.AddStudent)
+		i.GET("/:floor", api.GetLayer)
+		i.GET("/:floor/:layer", api.GetClass)
+		i.GET("/:floor/:layer/:class", api.GetSeat)
+	}
 
 	err := e.Run()
 	if err != nil {

@@ -20,3 +20,48 @@ type Classroom struct {
 	Seat9  uint   `gorm:"column:seat9;not null;default:0;comment:座位9" json:"seat9"`
 	Seat10 uint   `gorm:"column:seat10;not null;default:0;comment:座位10" json:"seat10"`
 }
+
+//
+// GetLayerByFloor
+//  @Description: 通过楼获取层
+//  @param floor 楼
+//  @return layer 层
+//
+func GetLayerByFloor(floor string) (layer []string) {
+	var classroom []Classroom
+	db.Distinct("layer").Where("floor = ?", floor).Find(&classroom)
+
+	for i := range classroom {
+		layer = append(layer, classroom[i].Layer)
+	}
+	return
+}
+
+//
+// GetClassByFloorAndLayer
+//  @Description: 通过楼和层获取班
+//  @param floor 楼
+//  @param layer 层
+//  @return class 班
+//
+func GetClassByFloorAndLayer(floor, layer string) (class []string) {
+	var classroom []Classroom
+	db.Select("class").Where("floor = ? and layer = ?", floor, layer).Find(&classroom)
+
+	for i := range classroom {
+		class = append(class, classroom[i].Class)
+	}
+	return
+}
+
+//
+// GetSeatByFloorAndLayerAndClass
+//  @Description: 通过楼和层和班获取座位
+//  @param floor 楼
+//  @param layer 层
+//  @param class 班
+//  @return seat 座位
+//
+func GetSeatByFloorAndLayerAndClass(floor, layer, class string) (seat map[int]int) {
+	return
+}

@@ -29,9 +29,9 @@ type Student struct {
 //  @Description: 通过昵称和密码判断学生是否存在
 //  @param name 昵称
 //  @param password 密码
-//  @return bool
+//  @return bool 布尔
 //
-func ExistStudentByNameAndPassword(name string, password string) bool {
+func ExistStudentByNameAndPassword(name, password string) bool {
 	var student Student
 	if err := db.Where(&Student{Name: name, Password: password}).First(&student).Error; err != nil {
 		return false
@@ -43,7 +43,7 @@ func ExistStudentByNameAndPassword(name string, password string) bool {
 // ExistStudentByName
 //  @Description: 通过昵称判断学生是否存在
 //  @param name 昵称
-//  @return bool
+//  @return bool 布尔
 //
 func ExistStudentByName(name string) bool {
 	var student Student
@@ -55,20 +55,9 @@ func ExistStudentByName(name string) bool {
 
 //
 // AddStudent
-//  @Description: 待删除
-//  @param student
+//  @Description: 添加学生
+//  @param student 学生
 //
 func AddStudent(student *Student) {
 	db.Create(student)
-}
-
-//
-// ListStudent
-//  @Description: 待删除
-//  @return []Student
-//
-func ListStudent() []Student {
-	var students []Student
-	db.Find(&students)
-	return students
 }
