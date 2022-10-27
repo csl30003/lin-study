@@ -21,33 +21,32 @@ type Student struct {
 	Inspired                   int32  `gorm:"column:inspired;type:int(4);not null;default:0;comment:加油次数" json:"inspired"`
 	Inspire                    int32  `gorm:"column:inspire;type:int(4);not null;default:0;comment:余香次数" json:"inspire"`
 	Money                      int32  `gorm:"column:money;type:int(4);default:0;comment:金币" json:"money"`
-	Status                     int8   `gorm:"column:status;type:tinyint(1);not null;default:0;comment:上线状态" json:"status"`
+	Status                     int8   `gorm:"column:status;type:tinyint(1);not null;default:0;comment:状态" json:"status"`
 }
 
-//
-// ExistStudentByNameAndPassword
-//  @Description: 通过昵称和密码判断学生是否存在
+// GetStudentByNameAndPassword
+//  @Description: 通过昵称和密码获取学生
 //  @param name 昵称
 //  @param password 密码
-//  @return bool 布尔
+//  @return bool
 //
-func ExistStudentByNameAndPassword(name, password string) bool {
+func GetStudentByNameAndPassword(name, password string) (Student, bool) {
 	var student Student
-	if err := db.Where(&Student{Name: name, Password: password}).First(&student).Error; err != nil {
-		return false
+	if err := db.Where("name = ? and password = ? and deleted_at is null", name, password).First(&student).Error; err != nil {
+		return student, false
 	}
-	return true
+	return student, true
 }
 
 //
 // ExistStudentByName
 //  @Description: 通过昵称判断学生是否存在
 //  @param name 昵称
-//  @return bool 布尔
+//  @return bool
 //
 func ExistStudentByName(name string) bool {
 	var student Student
-	if err := db.Where(&Student{Name: name}).First(&student).Error; err != nil {
+	if err := db.Where("name = ? and deleted_at is null", name).First(&student).Error; err != nil {
 		return false
 	}
 	return true
@@ -60,4 +59,10 @@ func ExistStudentByName(name string) bool {
 //
 func AddStudent(student *Student) {
 	db.Create(student)
+}
+
+func UpdateStudentStatus(id uint, status int8) (err error) {
+	var student Student
+	err = db.Model(&student).Where("id = ? and deleted_at is null", id).Update("status", status).Error
+	return
 }

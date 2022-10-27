@@ -28,7 +28,6 @@ func Start() {
 		},
 		MaxAge: 24 * time.Hour,
 	})
-
 	e.Use(mwCORS)
 
 	e.POST("/login", api.Login)
@@ -42,6 +41,8 @@ func Start() {
 		i.GET("/:floor", api.GetLayer)
 		i.GET("/:floor/:layer", api.GetClass)
 		i.GET("/:floor/:layer/:class", api.GetSeat)
+		i.PATCH("/:floor/:layer/:class/seat", api.Seat)
+		i.PATCH("/:floor/:layer/:class/unseat", api.Unseat)
 	}
 
 	err := e.Run()

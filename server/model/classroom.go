@@ -1,5 +1,10 @@
 package model
 
+import (
+	"errors"
+	"gorm.io/gorm"
+)
+
 //
 // Classroom
 //  @Description: 教室
@@ -29,7 +34,7 @@ type Classroom struct {
 //
 func GetLayerByFloor(floor string) (layer []string) {
 	var classroom []Classroom
-	db.Distinct("layer").Where("floor = ?", floor).Find(&classroom)
+	db.Distinct("layer").Where("floor = ? and deleted_at is null", floor).Find(&classroom)
 
 	for i := range classroom {
 		layer = append(layer, classroom[i].Layer)
@@ -46,7 +51,7 @@ func GetLayerByFloor(floor string) (layer []string) {
 //
 func GetClassByFloorAndLayer(floor, layer string) (class []string) {
 	var classroom []Classroom
-	db.Select("class").Where("floor = ? and layer = ?", floor, layer).Find(&classroom)
+	db.Select("class").Where("floor = ? and layer = ? and deleted_at is null", floor, layer).Find(&classroom)
 
 	for i := range classroom {
 		class = append(class, classroom[i].Class)
@@ -60,8 +65,81 @@ func GetClassByFloorAndLayer(floor, layer string) (class []string) {
 //  @param floor 楼
 //  @param layer 层
 //  @param class 班
-//  @return seat 座位
+//  @return map[int]uint
 //
-func GetSeatByFloorAndLayerAndClass(floor, layer, class string) (seat map[int]int) {
-	return
+func GetSeatByFloorAndLayerAndClass(floor, layer, class string) map[int]uint {
+	var classroom []Classroom
+	db.Where("floor = ? and layer = ? and class = ? and deleted_at is null", floor, layer, class).First(&classroom)
+
+	seat := make(map[int]uint, 10)
+	seat[1] = classroom[0].Seat1
+	seat[2] = classroom[0].Seat2
+	seat[3] = classroom[0].Seat3
+	seat[4] = classroom[0].Seat4
+	seat[5] = classroom[0].Seat5
+	seat[6] = classroom[0].Seat6
+	seat[7] = classroom[0].Seat7
+	seat[8] = classroom[0].Seat8
+	seat[9] = classroom[0].Seat9
+	seat[10] = classroom[0].Seat10
+
+	return seat
+}
+
+//
+// GetClassroomID
+//  @Description: 通过楼和层和班获取教室id
+//  @param floor 楼
+//  @param layer 层
+//  @param class 班
+//  @return uint
+//
+func GetClassroomID(floor, layer, class string) uint {
+	var classroom Classroom
+	db.Where("floor = ? and layer = ? and class = ? and deleted_at is null", floor, layer, class).First(&classroom)
+
+	return classroom.ID
+}
+
+//
+// UpdateSeat
+//  @Description: 更新座位
+//  @param floor 楼
+//  @param layer 层
+//  @param class 班
+//  @param seat 座位
+//  @param id 学生id
+//  @return bool
+//
+func UpdateSeat(floor, layer, class, seat string, id uint) bool {
+	var classroom Classroom
+
+	// 事务
+	err := db.Transaction(func(tx *gorm.DB) error {
+		// 待修改 先获取
+
+		seatStr := "seat" + seat
+		whereStr := "floor = ? and layer = ? and class = ? and " + seatStr + " = 0 and deleted_at is null"
+		result := db.Model(&classroom).Where(whereStr, floor, layer, class).Update(seatStr, id)
+		if result.RowsAffected == 0 {
+			return errors.New("update: no updated row")
+		}
+		if result.Error != nil {
+			return result.Error
+		}
+
+		// status为1代表正在座位上 为0代表无状态
+		var status int8 = 1
+		if id == 0 {
+			status = 0
+		}
+		if err := UpdateStudentStatus(id, status); err != nil {
+			return err
+		}
+		return nil
+	})
+	if err != nil {
+		return false
+	}
+	return true
 }

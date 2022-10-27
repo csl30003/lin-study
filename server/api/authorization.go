@@ -19,13 +19,14 @@ import (
 //
 func Login(c *gin.Context) {
 	var student model.Student
+	var ok bool
 
 	if err := c.ShouldBindJSON(&student); err != nil {
 		response.Failed(c, "参数错误")
 		return
 	}
 	//  校验用户名和密码
-	if ok := model.ExistStudentByNameAndPassword(student.Name, student.Password); !ok {
+	if student, ok = model.GetStudentByNameAndPassword(student.Name, student.Password); !ok {
 		response.Failed(c, "登录失败")
 		return
 	}
