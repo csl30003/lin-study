@@ -31,6 +31,7 @@ type Student struct {
 //  @return bool
 //
 func GetStudentByNameAndPassword(name, password string) (Student, bool) {
+	db := GetDBInstance()
 	var student Student
 	if err := db.Where("name = ? and password = ? and deleted_at is null", name, password).First(&student).Error; err != nil {
 		return student, false
@@ -45,6 +46,7 @@ func GetStudentByNameAndPassword(name, password string) (Student, bool) {
 //  @return bool
 //
 func ExistStudentByName(name string) bool {
+	db := GetDBInstance()
 	var student Student
 	if err := db.Where("name = ? and deleted_at is null", name).First(&student).Error; err != nil {
 		return false
@@ -58,10 +60,12 @@ func ExistStudentByName(name string) bool {
 //  @param student 学生
 //
 func AddStudent(student *Student) {
+	db := GetDBInstance()
 	db.Create(student)
 }
 
 func UpdateStudentStatus(id uint, status int8) (err error) {
+	db := GetDBInstance()
 	var student Student
 	err = db.Model(&student).Where("id = ? and deleted_at is null", id).Update("status", status).Error
 	return

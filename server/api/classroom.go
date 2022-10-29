@@ -82,5 +82,19 @@ func Seat(c *gin.Context) {
 //  @param c 上下文
 //
 func Unseat(c *gin.Context) {
+	claims, _ := c.Get("claims")
+	claimsValueElem := reflect.ValueOf(claims).Elem()
+	id := uint(claimsValueElem.FieldByName("ID").Uint())
+	floor, layer, class := c.Param("floor"), c.Param("layer"), c.Param("class")
+	seat, ok := c.GetPostForm("seat")
+	if !ok {
+		response.Failed(c, "获取座位失败")
+		return
+	}
 
+	if ok := model.UpdateUnseat(floor, layer, class, seat, id); !ok {
+		response.Failed(c, "更新失败")
+		return
+	}
+	response.Success(c, "更新成功", nil)
 }

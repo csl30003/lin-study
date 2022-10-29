@@ -43,6 +43,8 @@ func Start() {
 		i.GET("/:floor/:layer/:class", api.GetSeat)
 		i.PATCH("/:floor/:layer/:class/seat", api.Seat)
 		i.PATCH("/:floor/:layer/:class/unseat", api.Unseat)
+
+		i.POST("")
 	}
 
 	err := e.Run()

@@ -20,7 +20,16 @@ type Model struct {
 }
 
 //  数据库实例
-var db *gorm.DB
+var DB *gorm.DB
+
+//
+// GetDBInstance
+//  @Description: 单例模式 获取数据库实例
+//  @return *gorm.DB
+//
+func GetDBInstance() *gorm.DB {
+	return DB
+}
 
 //
 // init
@@ -38,6 +47,7 @@ func init() {
 	dsn := user + ":" + password + "@tcp(" + host + ":" + port + ")/" + database + "?charset=utf8mb4&parseTime=True&loc=Local"
 
 	//  连接MySQL
+	db := GetDBInstance()
 	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal("Failed to init db", err)
