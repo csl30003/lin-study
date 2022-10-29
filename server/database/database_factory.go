@@ -3,8 +3,6 @@ package database
 import (
 	"github.com/go-redis/redis"
 	"gorm.io/gorm"
-	"log"
-	"server/config"
 )
 
 //
@@ -12,7 +10,8 @@ import (
 //  @Description: 数据库接口
 //
 type Database interface {
-	Conn() interface{}
+	GetDBInstance() interface{}
+	Conn()
 }
 
 //
@@ -32,14 +31,8 @@ type mysqlFactory struct{}
 //  @receiver m MySQL
 //  @return Database
 //
-func (m mysqlFactory) CreateDatabase() Database {
-	host := config.Cfg.Section("MYSQL").Key("host").String()
-	port := config.Cfg.Section("MYSQL").Key("port").String()
-	user := config.Cfg.Section("MYSQL").Key("user").String()
-	password := config.Cfg.Section("MYSQL").Key("password").String()
-	database := config.Cfg.Section("MYSQL").Key("database").String()
-
-	return Mysql{host, port, user, password, database, nil}
+func (m *mysqlFactory) CreateDatabase() Database {
+	return &Mysql{}
 }
 
 //  Redis工厂
@@ -51,17 +44,8 @@ type redisFactory struct{}
 //  @receiver r Redis
 //  @return Database
 //
-func (r redisFactory) CreateDatabase() Database {
-	host := config.Cfg.Section("REDIS").Key("host").String()
-	port := config.Cfg.Section("REDIS").Key("port").String()
-	password := config.Cfg.Section("REDIS").Key("password").String()
-	database, err := config.Cfg.Section("REDIS").Key("database").Int()
-	if err != nil {
-		log.Fatal("Redis配置文件类型转换失败失败", err)
-		return nil
-	}
-
-	return Redis{host, port, password, database, nil}
+func (r *redisFactory) CreateDatabase() Database {
+	return &Redis{}
 }
 
 //
@@ -73,9 +57,9 @@ func (r redisFactory) CreateDatabase() Database {
 func NewFactory(s string) Factory {
 	switch s {
 	case "mysql":
-		return mysqlFactory{}
+		return &mysqlFactory{}
 	case "redis":
-		return redisFactory{}
+		return &redisFactory{}
 	}
 	return nil
 }
@@ -108,10 +92,12 @@ func init() {
 	//  初始化MySQL
 	mf := NewFactory("mysql")
 	md := mf.CreateDatabase()
-	mysqlDB = md.Conn().(*gorm.DB)
+	md.Conn()
+	mysqlDB = md.GetDBInstance().(*gorm.DB)
 
 	////  初始化Redis
 	//rf := NewFactory("redis")
 	//rd := rf.CreateDatabase()
-	//redisDB = rd.Conn().(*redis.Client)
+	//rd.Conn()
+	//redisDB = rd.GetDBInstance().(*redis.Client)
 }
