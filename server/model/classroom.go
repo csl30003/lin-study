@@ -3,6 +3,7 @@ package model
 import (
 	"errors"
 	"gorm.io/gorm"
+	"server/database"
 )
 
 //
@@ -33,7 +34,7 @@ type Classroom struct {
 //  @return layer 层
 //
 func GetLayerByFloor(floor string) (layer []string) {
-	db := GetDBInstance()
+	db := database.GetMysqlDBInstance()
 	var classroom []Classroom
 	db.Distinct("layer").Where("floor = ? and deleted_at is null", floor).Find(&classroom)
 
@@ -51,7 +52,7 @@ func GetLayerByFloor(floor string) (layer []string) {
 //  @return class 班
 //
 func GetClassByFloorAndLayer(floor, layer string) (class []string) {
-	db := GetDBInstance()
+	db := database.GetMysqlDBInstance()
 	var classroom []Classroom
 	db.Select("class").Where("floor = ? and layer = ? and deleted_at is null", floor, layer).Find(&classroom)
 
@@ -70,7 +71,7 @@ func GetClassByFloorAndLayer(floor, layer string) (class []string) {
 //  @return map[int]uint
 //
 func GetSeatByFloorAndLayerAndClass(floor, layer, class string) map[int]uint {
-	db := GetDBInstance()
+	db := database.GetMysqlDBInstance()
 	var classroom []Classroom
 	db.Where("floor = ? and layer = ? and class = ? and deleted_at is null", floor, layer, class).First(&classroom)
 
@@ -98,7 +99,7 @@ func GetSeatByFloorAndLayerAndClass(floor, layer, class string) map[int]uint {
 //  @return uint
 //
 func GetClassroomID(floor, layer, class string) uint {
-	db := GetDBInstance()
+	db := database.GetMysqlDBInstance()
 	var classroom Classroom
 	db.Where("floor = ? and layer = ? and class = ? and deleted_at is null", floor, layer, class).First(&classroom)
 
@@ -116,7 +117,7 @@ func GetClassroomID(floor, layer, class string) uint {
 //  @return bool
 //
 func UpdateSeat(floor, layer, class, seat string, id uint) bool {
-	db := GetDBInstance()
+	db := database.GetMysqlDBInstance()
 	var classroom Classroom
 
 	// 事务
@@ -153,7 +154,7 @@ func UpdateSeat(floor, layer, class, seat string, id uint) bool {
 //  @return bool
 //
 func UpdateUnseat(floor, layer, class, seat string, id uint) bool {
-	db := GetDBInstance()
+	db := database.GetMysqlDBInstance()
 	var classroom Classroom
 
 	// 事务
