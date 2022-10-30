@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"server/model"
 	"server/response"
+	"strconv"
 )
 
 //
@@ -89,6 +90,11 @@ func Seat(c *gin.Context) {
 		response.Failed(c, "获取教室失败")
 		return
 	}
+	intClassroomID, err := strconv.Atoi(classroomID)
+	if err != nil {
+		response.Failed(c, "获取教室失败")
+		return
+	}
 
 	seat, ok := c.GetPostForm("seat")
 	if !ok {
@@ -96,7 +102,7 @@ func Seat(c *gin.Context) {
 		return
 	}
 
-	if ok := model.UpdateSeat(studentID, classroomID, seat); !ok {
+	if ok := model.UpdateSeat(studentID, uint(intClassroomID), seat); !ok {
 		response.Failed(c, "更新失败")
 		return
 	}
@@ -109,7 +115,6 @@ func Seat(c *gin.Context) {
 //  @param c 上下文
 //
 func Unseat(c *gin.Context) {
-	// 反射获取student_id
 	claims, _ := c.Get("claims")
 	claimsValueElem := reflect.ValueOf(claims).Elem()
 	studentID := uint(claimsValueElem.FieldByName("ID").Uint())
@@ -125,6 +130,11 @@ func Unseat(c *gin.Context) {
 		response.Failed(c, "获取教室失败")
 		return
 	}
+	intClassroomID, err := strconv.Atoi(classroomID)
+	if err != nil {
+		response.Failed(c, "获取教室失败")
+		return
+	}
 
 	seat, ok := c.GetPostForm("seat")
 	if !ok {
@@ -132,7 +142,7 @@ func Unseat(c *gin.Context) {
 		return
 	}
 
-	if ok := model.UpdateUnseat(studentID, classroomID, seat); !ok {
+	if ok := model.UpdateUnseat(studentID, uint(intClassroomID), seat); !ok {
 		response.Failed(c, "更新失败")
 		return
 	}

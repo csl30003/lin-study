@@ -45,9 +45,9 @@ func Start() {
 		i.PATCH("/:floor/:layer/:class/seat", api.Seat)
 		i.PATCH("/:floor/:layer/:class/unseat", api.Unseat)
 
-		i.GET("/collectionClassroom")
-		i.POST("/collectionClassroom")
-		i.DELETE("/collectionClassroom")
+		i.GET("/collectClassroom", api.GetCollectClassroom)
+		i.POST("/collectClassroom", api.AddCollectClassroom)
+		i.DELETE("/collectClassroom", api.CancelCollectClassroom)
 	}
 
 	err := e.Run(":8080")

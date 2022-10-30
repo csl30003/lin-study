@@ -37,7 +37,7 @@ type Student struct {
 func GetStudentByNameAndPassword(name, password string) (Student, bool) {
 	db := database.GetMysqlDBInstance()
 	var student Student
-	if err := db.Where("name = ? and password = ? and deleted_at is null", name, password).First(&student).Error; err != nil {
+	if err := db.Where("name = ? and password = ?", name, password).First(&student).Error; err != nil {
 		return student, false
 	}
 	return student, true
@@ -52,7 +52,7 @@ func GetStudentByNameAndPassword(name, password string) (Student, bool) {
 func ExistStudentByName(name string) bool {
 	db := database.GetMysqlDBInstance()
 	var student Student
-	if err := db.Where("name = ? and deleted_at is null", name).First(&student).Error; err != nil {
+	if err := db.Where("name = ?", name).First(&student).Error; err != nil {
 		return false
 	}
 	return true
@@ -92,6 +92,6 @@ func GetStudentStatus(id uint) int8 {
 func UpdateStudentStatus(id uint, status int8) (err error) {
 	db := database.GetMysqlDBInstance()
 	var student Student
-	err = db.Model(&student).Where("id = ? and deleted_at is null", id).Update("status", status).Error
+	err = db.Model(&student).Where("id = ?", id).Update("status", status).Error
 	return
 }

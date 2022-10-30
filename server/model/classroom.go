@@ -4,7 +4,6 @@ import (
 	"errors"
 	"gorm.io/gorm"
 	"server/database"
-	"strconv"
 )
 
 //
@@ -29,6 +28,21 @@ type Classroom struct {
 }
 
 //
+// GetClassroomNum
+//  @Description: 获取教室的数量
+//  @return int
+//
+func GetClassroomNum() uint {
+	db := database.GetMysqlDBInstance()
+	var (
+		classroom []Classroom
+		count     int64
+	)
+	db.Model(&classroom).Count(&count)
+	return uint(count)
+}
+
+//
 // GetLayerByFloor
 //  @Description: 通过楼获取层
 //  @param floor 楼
@@ -37,7 +51,7 @@ type Classroom struct {
 func GetLayerByFloor(floor string) (layer []string) {
 	db := database.GetMysqlDBInstance()
 	var classroom []Classroom
-	db.Distinct("layer").Where("floor = ? and deleted_at is null", floor).Find(&classroom)
+	db.Distinct("layer").Where("floor = ?", floor).Find(&classroom)
 
 	for i := range classroom {
 		layer = append(layer, classroom[i].Layer)
@@ -55,7 +69,7 @@ func GetLayerByFloor(floor string) (layer []string) {
 func GetClassByFloorAndLayer(floor, layer string) (class []string) {
 	db := database.GetMysqlDBInstance()
 	var classroom []Classroom
-	db.Select("class").Where("floor = ? and layer = ? and deleted_at is null", floor, layer).Find(&classroom)
+	db.Select("class").Where("floor = ? and layer = ?", floor, layer).Find(&classroom)
 
 	for i := range classroom {
 		class = append(class, classroom[i].Class)
@@ -74,7 +88,7 @@ func GetClassByFloorAndLayer(floor, layer string) (class []string) {
 func GetSeatByFloorAndLayerAndClass(floor, layer, class string) map[int]uint {
 	db := database.GetMysqlDBInstance()
 	var classroom []Classroom
-	db.Where("floor = ? and layer = ? and class = ? and deleted_at is null", floor, layer, class).First(&classroom)
+	db.Where("floor = ? and layer = ? and class = ?", floor, layer, class).First(&classroom)
 
 	seat := make(map[int]uint, 10)
 	seat[1] = classroom[0].Seat1
@@ -102,7 +116,7 @@ func GetSeatByFloorAndLayerAndClass(floor, layer, class string) map[int]uint {
 func GetClassroomID(floor, layer, class string) (uint, bool) {
 	db := database.GetMysqlDBInstance()
 	var classroom Classroom
-	if err := db.Where("floor = ? and layer = ? and class = ? and deleted_at is null", floor, layer, class).First(&classroom).Error; err != nil {
+	if err := db.Where("floor = ? and layer = ? and class = ?", floor, layer, class).First(&classroom).Error; err != nil {
 		return classroom.ID, false
 	}
 	return classroom.ID, true
@@ -116,14 +130,14 @@ func GetClassroomID(floor, layer, class string) (uint, bool) {
 //  @param seat 座位
 //  @return bool
 //
-func UpdateSeat(studentID uint, classroomID, seat string) bool {
+func UpdateSeat(studentID, classroomID uint, seat string) bool {
 	db := database.GetMysqlDBInstance()
 	var classroom Classroom
 
 	// 事务
 	err := db.Transaction(func(tx *gorm.DB) error {
 		seatStr := "seat" + seat
-		whereStr := "id = ? and " + seatStr + " = 0 and deleted_at is null"
+		whereStr := "id = ? and " + seatStr + " = 0"
 		result := db.Model(&classroom).Where(whereStr, classroomID).Update(seatStr, studentID)
 		if result.RowsAffected == 0 {
 			return errors.New("update: no updated row")
@@ -151,15 +165,15 @@ func UpdateSeat(studentID uint, classroomID, seat string) bool {
 //  @param seat 座位
 //  @return bool
 //
-func UpdateUnseat(studentID uint, classroomID, seat string) bool {
+func UpdateUnseat(studentID, classroomID uint, seat string) bool {
 	db := database.GetMysqlDBInstance()
 	var classroom Classroom
 
 	// 事务
 	err := db.Transaction(func(tx *gorm.DB) error {
 		seatStr := "seat" + seat
-		whereStr := "id = ? and " + seatStr + " = ? and deleted_at is null"
-		result := db.Model(&classroom).Where(whereStr, classroomID, strconv.Itoa(int(studentID))).Update(seatStr, 0)
+		whereStr := "id = ? and " + seatStr + " = ?"
+		result := db.Model(&classroom).Where(whereStr, classroomID, studentID).Update(seatStr, 0)
 		if result.RowsAffected == 0 {
 			return errors.New("update: no updated row")
 		}
