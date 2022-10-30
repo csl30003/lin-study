@@ -4,6 +4,7 @@ import (
 	"errors"
 	"gorm.io/gorm"
 	"server/database"
+	"strconv"
 )
 
 //
@@ -116,15 +117,15 @@ func GetClassroomID(floor, layer, class string) uint {
 //  @param id 学生id
 //  @return bool
 //
-func UpdateSeat(floor, layer, class, seat string, id uint) bool {
+func UpdateSeat(studentID uint, classroomID, seat string) bool {
 	db := database.GetMysqlDBInstance()
 	var classroom Classroom
 
 	// 事务
 	err := db.Transaction(func(tx *gorm.DB) error {
 		seatStr := "seat" + seat
-		whereStr := "floor = ? and layer = ? and class = ? and " + seatStr + " = 0 and deleted_at is null"
-		result := db.Model(&classroom).Where(whereStr, floor, layer, class).Update(seatStr, id)
+		whereStr := "id = ? and " + seatStr + " = 0 and deleted_at is null"
+		result := db.Model(&classroom).Where(whereStr, classroomID).Update(seatStr, studentID)
 		if result.RowsAffected == 0 {
 			return errors.New("update: no updated row")
 		}
@@ -132,7 +133,7 @@ func UpdateSeat(floor, layer, class, seat string, id uint) bool {
 			return result.Error
 		}
 
-		if err := UpdateStudentStatus(id, 1); err != nil {
+		if err := UpdateStudentStatus(studentID, 1); err != nil {
 			return err
 		}
 		return nil
@@ -153,15 +154,15 @@ func UpdateSeat(floor, layer, class, seat string, id uint) bool {
 //  @param id 学生id
 //  @return bool
 //
-func UpdateUnseat(floor, layer, class, seat string, id uint) bool {
+func UpdateUnseat(studentID uint, classroomID, seat string) bool {
 	db := database.GetMysqlDBInstance()
 	var classroom Classroom
 
 	// 事务
 	err := db.Transaction(func(tx *gorm.DB) error {
 		seatStr := "seat" + seat
-		whereStr := "floor = ? and layer = ? and class = ? and " + seatStr + " != 0 and deleted_at is null"
-		result := db.Model(&classroom).Where(whereStr, floor, layer, class).Update(seatStr, 0)
+		whereStr := "id = ? and " + seatStr + " = ? and deleted_at is null"
+		result := db.Model(&classroom).Where(whereStr, classroomID, strconv.Itoa(int(studentID))).Update(seatStr, 0)
 		if result.RowsAffected == 0 {
 			return errors.New("update: no updated row")
 		}
@@ -169,7 +170,7 @@ func UpdateUnseat(floor, layer, class, seat string, id uint) bool {
 			return result.Error
 		}
 
-		if err := UpdateStudentStatus(id, 0); err != nil {
+		if err := UpdateStudentStatus(studentID, 0); err != nil {
 			return err
 		}
 		return nil

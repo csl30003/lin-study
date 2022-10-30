@@ -58,18 +58,30 @@ func GetSeat(c *gin.Context) {
 //  @param c 上下文
 //
 func Seat(c *gin.Context) {
+	// 反射获取student_id
 	claims, _ := c.Get("claims")
-	// 反射获取id
 	claimsValueElem := reflect.ValueOf(claims).Elem()
-	id := uint(claimsValueElem.FieldByName("ID").Uint())
-	floor, layer, class := c.Param("floor"), c.Param("layer"), c.Param("class")
+	studentID := uint(claimsValueElem.FieldByName("ID").Uint())
+
+	// 查看学生是否在专注
+	if model.GetStudentStatus(studentID) == 1 {
+		response.Failed(c, "学生正在专注")
+		return
+	}
+
+	classroomID, ok := c.GetPostForm("classroom_id")
+	if !ok {
+		response.Failed(c, "获取教室失败")
+		return
+	}
+
 	seat, ok := c.GetPostForm("seat")
 	if !ok {
 		response.Failed(c, "获取座位失败")
 		return
 	}
 
-	if ok := model.UpdateSeat(floor, layer, class, seat, id); !ok {
+	if ok := model.UpdateSeat(studentID, classroomID, seat); !ok {
 		response.Failed(c, "更新失败")
 		return
 	}
@@ -82,17 +94,30 @@ func Seat(c *gin.Context) {
 //  @param c 上下文
 //
 func Unseat(c *gin.Context) {
+	// 反射获取student_id
 	claims, _ := c.Get("claims")
 	claimsValueElem := reflect.ValueOf(claims).Elem()
-	id := uint(claimsValueElem.FieldByName("ID").Uint())
-	floor, layer, class := c.Param("floor"), c.Param("layer"), c.Param("class")
+	studentID := uint(claimsValueElem.FieldByName("ID").Uint())
+
+	// 查看学生是否在专注
+	if model.GetStudentStatus(studentID) == 0 {
+		response.Failed(c, "学生不在座位上")
+		return
+	}
+
+	classroomID, ok := c.GetPostForm("classroom_id")
+	if !ok {
+		response.Failed(c, "获取教室失败")
+		return
+	}
+
 	seat, ok := c.GetPostForm("seat")
 	if !ok {
 		response.Failed(c, "获取座位失败")
 		return
 	}
 
-	if ok := model.UpdateUnseat(floor, layer, class, seat, id); !ok {
+	if ok := model.UpdateUnseat(studentID, classroomID, seat); !ok {
 		response.Failed(c, "更新失败")
 		return
 	}

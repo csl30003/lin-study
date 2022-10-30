@@ -26,7 +26,7 @@ type Mysql struct {
 //  @receiver m MySQL
 //  @return interface{}
 //
-func (m *Mysql) GetDBInstance() interface{} {
+func (m *Mysql) GetDBInstance() any {
 	return m.db
 }
 

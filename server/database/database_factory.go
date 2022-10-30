@@ -10,7 +10,7 @@ import (
 //  @Description: 数据库接口
 //
 type Database interface {
-	GetDBInstance() interface{}
+	GetDBInstance() any
 	Conn()
 }
 

@@ -68,6 +68,27 @@ func AddStudent(student *Student) {
 	db.Create(student)
 }
 
+//
+// GetStudentStatus
+//  @Description:
+//  @param id
+//  @return int8
+//
+func GetStudentStatus(id uint) int8 {
+	db := database.GetMysqlDBInstance()
+	var student Student
+	db.Where("id = ?", id).First(&student)
+
+	return student.Status
+}
+
+//
+// UpdateStudentStatus
+//  @Description:
+//  @param id
+//  @param status
+//  @return err
+//
 func UpdateStudentStatus(id uint, status int8) (err error) {
 	db := database.GetMysqlDBInstance()
 	var student Student

@@ -24,7 +24,7 @@ type Redis struct {
 //  @receiver r Redis
 //  @return interface{}
 //
-func (r *Redis) GetDBInstance() interface{} {
+func (r *Redis) GetDBInstance() any {
 	return r.db
 }
 
