@@ -53,6 +53,21 @@ func GetSeat(c *gin.Context) {
 }
 
 //
+// GetClassroomID
+//  @Description: 获取教室ID
+//  @param c 上下文
+//
+func GetClassroomID(c *gin.Context) {
+	floor, layer, class := c.Param("floor"), c.Param("layer"), c.Param("class")
+	classroomID, ok := model.GetClassroomID(floor, layer, class)
+	if !ok {
+		response.Failed(c, "获取失败")
+		return
+	}
+	response.Success(c, "获取成功", classroomID)
+}
+
+//
 // Seat
 //  @Description: 入座
 //  @param c 上下文

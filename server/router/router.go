@@ -41,9 +41,13 @@ func Start() {
 		i.GET("/:floor", api.GetLayer)
 		i.GET("/:floor/:layer", api.GetClass)
 		i.GET("/:floor/:layer/:class", api.GetSeat)
+		i.GET("/:floor/:layer/:class/getClassroomID", api.GetClassroomID)
 		i.PATCH("/:floor/:layer/:class/seat", api.Seat)
 		i.PATCH("/:floor/:layer/:class/unseat", api.Unseat)
-		i.POST("")
+
+		i.GET("/collectionClassroom")
+		i.POST("/collectionClassroom")
+		i.DELETE("/collectionClassroom")
 	}
 
 	err := e.Run(":8080")

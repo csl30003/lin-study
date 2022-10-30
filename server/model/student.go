@@ -70,8 +70,8 @@ func AddStudent(student *Student) {
 
 //
 // GetStudentStatus
-//  @Description:
-//  @param id
+//  @Description: 获取学生状态
+//  @param id 学生ID
 //  @return int8
 //
 func GetStudentStatus(id uint) int8 {
@@ -84,9 +84,9 @@ func GetStudentStatus(id uint) int8 {
 
 //
 // UpdateStudentStatus
-//  @Description:
-//  @param id
-//  @param status
+//  @Description: 更新学生状态
+//  @param id 学生ID
+//  @param status 状态
 //  @return err
 //
 func UpdateStudentStatus(id uint, status int8) (err error) {

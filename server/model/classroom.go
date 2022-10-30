@@ -93,28 +93,27 @@ func GetSeatByFloorAndLayerAndClass(floor, layer, class string) map[int]uint {
 
 //
 // GetClassroomID
-//  @Description: 通过楼和层和班获取教室id
+//  @Description: 通过楼和层和班获取教室ID
 //  @param floor 楼
 //  @param layer 层
 //  @param class 班
 //  @return uint
 //
-func GetClassroomID(floor, layer, class string) uint {
+func GetClassroomID(floor, layer, class string) (uint, bool) {
 	db := database.GetMysqlDBInstance()
 	var classroom Classroom
-	db.Where("floor = ? and layer = ? and class = ? and deleted_at is null", floor, layer, class).First(&classroom)
-
-	return classroom.ID
+	if err := db.Where("floor = ? and layer = ? and class = ? and deleted_at is null", floor, layer, class).First(&classroom).Error; err != nil {
+		return classroom.ID, false
+	}
+	return classroom.ID, true
 }
 
 //
 // UpdateSeat
 //  @Description: 入座
-//  @param floor 楼
-//  @param layer 层
-//  @param class 班
+//  @param studentID 学生ID
+//  @param classroomID 教室ID
 //  @param seat 座位
-//  @param id 学生id
 //  @return bool
 //
 func UpdateSeat(studentID uint, classroomID, seat string) bool {
@@ -147,11 +146,9 @@ func UpdateSeat(studentID uint, classroomID, seat string) bool {
 //
 // UpdateUnseat
 //  @Description: 离座
-//  @param floor 楼
-//  @param layer 层
-//  @param class 班
+//  @param studentID 学生ID
+//  @param classroomID 教室ID
 //  @param seat 座位
-//  @param id 学生id
 //  @return bool
 //
 func UpdateUnseat(studentID uint, classroomID, seat string) bool {
