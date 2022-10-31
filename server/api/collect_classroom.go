@@ -23,7 +23,6 @@ func GetCollectClassroom(c *gin.Context) {
 		response.Success(c, "无收藏教室", collectClassroom)
 		return
 	}
-	//   判断是否有数据 没有就返回 response.Success(c, "无收藏教室", collectClassroom)
 	response.Success(c, "获取成功", collectClassroom)
 }
 

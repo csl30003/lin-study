@@ -13,6 +13,23 @@ type ConcentrateTarget struct {
 }
 
 //
+// GetConcentrateTargetByStudentID
+//  @Description:
+//  @param studentID
+//  @return targetSlice
+//
+func GetConcentrateTargetByStudentID(studentID uint) (targetSlice []string) {
+	db := database.GetMysqlDBInstance()
+	var concentrateTarget []ConcentrateTarget
+	db.Where("student_id = ?", studentID).Find(&concentrateTarget)
+
+	for i := range concentrateTarget {
+		targetSlice = append(targetSlice, concentrateTarget[i].Target)
+	}
+	return
+}
+
+//
 // ExistConcentrateTarget
 //  @Description:
 //  @param concentrateTarget

@@ -13,7 +13,16 @@ import (
 //  @param c 上下文
 //
 func GetConcentrateTarget(c *gin.Context) {
+	claims, _ := c.Get("claims")
+	claimsValueElem := reflect.ValueOf(claims).Elem()
+	studentID := uint(claimsValueElem.FieldByName("ID").Uint())
 
+	targetSlice := model.GetConcentrateTargetByStudentID(studentID)
+	if len(targetSlice) == 0 {
+		response.Success(c, "无专注目标", targetSlice)
+		return
+	}
+	response.Success(c, "获取成功", targetSlice)
 }
 
 //
