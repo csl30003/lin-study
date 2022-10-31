@@ -2,7 +2,6 @@ package model
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"server/database"
 )
@@ -64,7 +63,6 @@ func GetCollectClassroomByStudentID(studentID uint) ([]CollectClassroomTemp, boo
 		if err != nil {
 			return nil, false
 		}
-		fmt.Println(collectClassroomTemp)
 		collectClassroomTempSlice = append(collectClassroomTempSlice, collectClassroomTemp)
 	}
 	return collectClassroomTempSlice, true
