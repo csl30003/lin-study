@@ -42,8 +42,15 @@ func Start() {
 		i.GET("/:floor/:layer", api.GetClass)
 		i.GET("/:floor/:layer/:class", api.GetSeat)
 		i.GET("/:floor/:layer/:class/getClassroomID", api.GetClassroomID)
-		i.PATCH("/:floor/:layer/:class/seat", api.Seat)
-		i.PATCH("/:floor/:layer/:class/unseat", api.Unseat)
+
+		c := i.Group("/classroom")
+		{
+			c.PATCH("/seat", api.Seat)
+			c.PATCH("/unseat", api.Unseat)
+
+			c.POST("/concentrate", api.BeginConcentrate)
+			c.PATCH("/concentrate", api.EndConcentrate)
+		}
 
 		i.GET("/collectClassroom", api.GetCollectClassroom)
 		i.POST("/collectClassroom", api.AddCollectClassroom)
