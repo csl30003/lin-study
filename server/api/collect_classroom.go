@@ -61,11 +61,11 @@ func AddCollectClassroom(c *gin.Context) {
 }
 
 //
-// CancelCollectClassroom
+// DeleteCollectClassroom
 //  @Description: 取消收藏教室
 //  @param c 上下文
 //
-func CancelCollectClassroom(c *gin.Context) {
+func DeleteCollectClassroom(c *gin.Context) {
 	claims, _ := c.Get("claims")
 	claimsValueElem := reflect.ValueOf(claims).Elem()
 	studentID := uint(claimsValueElem.FieldByName("ID").Uint())

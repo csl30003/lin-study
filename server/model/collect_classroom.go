@@ -75,10 +75,9 @@ func GetCollectClassroomByStudentID(studentID uint) ([]CollectClassroomTemp, boo
 //  @param classroomID 教室ID
 //  @return bool
 //
-func ExistCollectClassroom(classroom *CollectClassroom) bool {
+func ExistCollectClassroom(collectClassroom *CollectClassroom) bool {
 	db := database.GetMysqlDBInstance()
-	var collectClassroom CollectClassroom
-	if err := db.Where("student_id = ? and classroom_id = ?", classroom.StudentId, classroom.ClassroomId).First(&collectClassroom).Error; err != nil {
+	if err := db.Where("student_id = ? and classroom_id = ?", collectClassroom.StudentId, collectClassroom.ClassroomId).First(&collectClassroom).Error; err != nil {
 		return false
 	}
 	return true
@@ -91,10 +90,9 @@ func ExistCollectClassroom(classroom *CollectClassroom) bool {
 //  @return uint
 //  @return bool
 //
-func GetCollectClassroomID(classroom *CollectClassroom) (uint, bool) {
+func GetCollectClassroomID(collectClassroom *CollectClassroom) (uint, bool) {
 	db := database.GetMysqlDBInstance()
-	var collectClassroom CollectClassroom
-	if err := db.Where("student_id = ? and classroom_id = ?", classroom.StudentId, classroom.ClassroomId).First(&collectClassroom).Error; err != nil {
+	if err := db.Where("student_id = ? and classroom_id = ?", collectClassroom.StudentId, collectClassroom.ClassroomId).First(&collectClassroom).Error; err != nil {
 		return collectClassroom.ID, false
 	}
 	return collectClassroom.ID, true
@@ -105,9 +103,9 @@ func GetCollectClassroomID(classroom *CollectClassroom) (uint, bool) {
 //  @Description: 添加收藏教室
 //  @param classroom 收藏教室
 //
-func AddCollectClassroom(classroom *CollectClassroom) {
+func AddCollectClassroom(collectClassroom *CollectClassroom) {
 	db := database.GetMysqlDBInstance()
-	db.Create(classroom)
+	db.Create(collectClassroom)
 }
 
 //
@@ -115,7 +113,7 @@ func AddCollectClassroom(classroom *CollectClassroom) {
 //  @Description: 删除收藏教室
 //  @param classroom 收藏教室
 //
-func DeleteCollectClassroom(classroom *CollectClassroom) {
+func DeleteCollectClassroom(collectClassroom *CollectClassroom) {
 	db := database.GetMysqlDBInstance()
-	db.Delete(&classroom)
+	db.Delete(&collectClassroom)
 }

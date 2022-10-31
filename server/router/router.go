@@ -47,7 +47,11 @@ func Start() {
 
 		i.GET("/collectClassroom", api.GetCollectClassroom)
 		i.POST("/collectClassroom", api.AddCollectClassroom)
-		i.DELETE("/collectClassroom", api.CancelCollectClassroom)
+		i.DELETE("/collectClassroom", api.DeleteCollectClassroom)
+
+		i.GET("/concentrateTarget", api.GetConcentrateTarget)
+		i.POST("/concentrateTarget", api.AddConcentrateTarget)
+		i.DELETE("/concentrateTarget", api.DeleteConcentrateTarget)
 	}
 
 	err := e.Run(":8080")
