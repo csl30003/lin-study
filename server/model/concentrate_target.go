@@ -1,6 +1,8 @@
 package model
 
-import "server/database"
+import (
+	"server/database"
+)
 
 //
 // ConcentrateTarget
@@ -14,18 +16,13 @@ type ConcentrateTarget struct {
 
 //
 // GetConcentrateTargetByStudentID
-//  @Description:
-//  @param studentID
-//  @return targetSlice
+//  @Description: 通过学生ID获取专注目标
+//  @param studentID 学生ID
+//  @return []ConcentrateTarget
 //
-func GetConcentrateTargetByStudentID(studentID uint) (targetSlice []string) {
+func GetConcentrateTargetByStudentID(studentID uint) (concentrateTarget []ConcentrateTarget) {
 	db := database.GetMysqlDBInstance()
-	var concentrateTarget []ConcentrateTarget
 	db.Where("student_id = ?", studentID).Find(&concentrateTarget)
-
-	for i := range concentrateTarget {
-		targetSlice = append(targetSlice, concentrateTarget[i].Target)
-	}
 	return
 }
 
