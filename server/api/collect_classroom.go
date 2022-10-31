@@ -3,19 +3,10 @@ package api
 import (
 	"github.com/gin-gonic/gin"
 	"reflect"
+	"server/common"
 	"server/model"
 	"server/response"
 )
-
-var classroomNum uint
-
-//
-// init
-//  @Description: 初始化计算教室的数量
-//
-func init() {
-	classroomNum = model.GetClassroomNum()
-}
 
 //
 // GetCollectClassroom
@@ -27,7 +18,10 @@ func GetCollectClassroom(c *gin.Context) {
 	claimsValueElem := reflect.ValueOf(claims).Elem()
 	studentID := uint(claimsValueElem.FieldByName("ID").Uint())
 
-	collectClassroom := model.GetCollectClassroomByStudentID(studentID)
+	collectClassroom, ok := model.GetCollectClassroomByStudentID(studentID)
+	if !ok {
+		response.Success(c, "无收藏教室", collectClassroom)
+	}
 	//   判断是否有数据 没有就返回 response.Success(c, "无收藏教室", collectClassroom)
 	response.Success(c, "获取成功", collectClassroom)
 }
@@ -48,7 +42,7 @@ func AddCollectClassroom(c *gin.Context) {
 		response.Failed(c, "参数错误")
 		return
 	}
-	if collectClassroom.ClassroomId <= 0 || collectClassroom.ClassroomId > classroomNum {
+	if collectClassroom.ClassroomId <= 0 || collectClassroom.ClassroomId > common.ClassroomNum {
 		response.Failed(c, "参数错误")
 		return
 	}
@@ -81,7 +75,7 @@ func CancelCollectClassroom(c *gin.Context) {
 		response.Failed(c, "参数错误")
 		return
 	}
-	if collectClassroom.ClassroomId <= 0 || collectClassroom.ClassroomId > classroomNum {
+	if collectClassroom.ClassroomId <= 0 || collectClassroom.ClassroomId > common.ClassroomNum {
 		response.Failed(c, "参数错误")
 		return
 	}

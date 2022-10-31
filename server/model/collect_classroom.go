@@ -1,6 +1,9 @@
 package model
 
 import (
+	"database/sql"
+	"fmt"
+	"log"
 	"server/database"
 )
 
@@ -15,13 +18,56 @@ type CollectClassroom struct {
 }
 
 //
+// CollectClassroomTemp
+//  @Description: 收藏教室的一种展示结构体
+//
+type CollectClassroomTemp struct {
+	Id   uint   `json:"id"`
+	Name string `json:"name"`
+}
+
+//
 // GetCollectClassroomByStudentID
 //  @Description: 通过学生ID获取收藏教室
 //  @param studentID 学生ID
-//  @return map[uint]string
+//  @return []CollectClassroomTemp
+//  @return bool
 //
-func GetCollectClassroomByStudentID(studentID uint) map[uint]string {
-	return nil
+func GetCollectClassroomByStudentID(studentID uint) ([]CollectClassroomTemp, bool) {
+	db := database.GetMysqlDBInstance()
+	var collectClassroomTempSlice []CollectClassroomTemp
+
+	s := `
+		select c.id ,concat(c.floor, "-", c.layer, "-", c.class) as name
+		from classrooms c 
+		where c.deleted_at is null and c.id in 
+		(
+			select cc.classroom_id  
+			from collect_classrooms cc  
+			where cc.deleted_at is null and cc.student_id = ?
+		)
+	`
+	rows, err := db.Raw(s, studentID).Rows()
+	if err != nil {
+		return nil, false
+	}
+	defer func(rows *sql.Rows) {
+		err := rows.Close()
+		if err != nil {
+			log.Println("Rows 关闭失败")
+		}
+	}(rows)
+
+	for rows.Next() {
+		var collectClassroomTemp CollectClassroomTemp
+		err := db.ScanRows(rows, &collectClassroomTemp)
+		if err != nil {
+			return nil, false
+		}
+		fmt.Println(collectClassroomTemp)
+		collectClassroomTempSlice = append(collectClassroomTempSlice, collectClassroomTemp)
+	}
+	return collectClassroomTempSlice, true
 }
 
 //
