@@ -95,9 +95,9 @@ func init() {
 	md.Conn()
 	mysqlDB = md.GetDBInstance().(*gorm.DB)
 
-	////  初始化Redis
-	//rf := NewFactory("redis")
-	//rd := rf.CreateDatabase()
-	//rd.Conn()
-	//redisDB = rd.GetDBInstance().(*redis.Client)
+	//  初始化Redis
+	rf := NewFactory("redis")
+	rd := rf.CreateDatabase()
+	rd.Conn()
+	redisDB = rd.GetDBInstance().(*redis.Client)
 }

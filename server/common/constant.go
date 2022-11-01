@@ -2,8 +2,12 @@ package common
 
 import "server/model"
 
-// ClassroomNum 教室的数量
-var ClassroomNum uint
+var (
+	// ClassroomNum 教室的数量
+	ClassroomNum uint
+	// RedisKeyStudentID Redis的key命名前缀student_id
+	RedisKeyStudentID = "lin_study:student_id:"
+)
 
 //
 // init

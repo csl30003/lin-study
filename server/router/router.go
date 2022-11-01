@@ -49,7 +49,10 @@ func Start() {
 			c.PATCH("/unseat", api.Unseat)
 
 			c.POST("/concentrate", api.BeginConcentrate)
+			c.DELETE("/concentrate", api.QuitConcentrate)
 			c.PATCH("/concentrate", api.EndConcentrate)
+			c.PATCH("/concentrateOut", api.OutConcentrate)
+			c.PATCH("/concentrateBack", api.BackConcentrate)
 		}
 
 		i.GET("/collectClassroom", api.GetCollectClassroom)
