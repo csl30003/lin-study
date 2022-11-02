@@ -4,7 +4,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"server/config"
+	"server/conf"
 	"server/response"
 )
 
@@ -37,7 +37,7 @@ func JWT() gin.HandlerFunc {
 		tokenString := ck.Value
 		claims := &Claims{}
 
-		jwtKey := []byte(config.Cfg.Section("JWT").Key("secret_key").String())
+		jwtKey := []byte(conf.Cfg.Section("JWT").Key("secret_key").String())
 
 		//  解析JWT字符串并吧结果存储在claims中
 		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {

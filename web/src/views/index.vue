@@ -41,7 +41,7 @@ export default defineComponent({
 })
 </script>
 
-<style>
+<style scoped>
 .h1-class-1 {
   text-align: center;
   font-size: 120px;

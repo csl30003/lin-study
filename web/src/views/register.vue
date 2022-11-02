@@ -91,7 +91,7 @@ const resetForm = (formEl: FormInstance | undefined) => {
 
 
 
-<style>
+<style scoped>
 h1{
   text-align: center;
 }

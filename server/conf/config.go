@@ -1,4 +1,4 @@
-package config
+package conf
 
 import (
 	"gopkg.in/ini.v1"
@@ -10,7 +10,7 @@ var Cfg *ini.File
 
 func init() {
 	var err error
-	Cfg, err = ini.Load("./config/dev/config.ini")
+	Cfg, err = ini.Load("./conf/dev/conf.ini")
 	if err != nil {
 		log.Println("文件读取失败", err)
 		os.Exit(1)

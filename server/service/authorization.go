@@ -1,11 +1,11 @@
-package api
+package service
 
 import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"server/config"
+	"server/conf"
 	"server/middleware"
 	"server/model"
 	"server/response"
@@ -44,7 +44,7 @@ func Login(c *gin.Context) {
 	//  使用用于签名的算法和令牌
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	jwtKey := []byte(config.Cfg.Section("JWT").Key("secret_key").String())
+	jwtKey := []byte(conf.Cfg.Section("JWT").Key("secret_key").String())
 	//  创建JWT字符串
 	tokenString, err := token.SignedString(jwtKey)
 	if err != nil {

@@ -4,7 +4,7 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"log"
-	"server/config"
+	"server/conf"
 )
 
 //
@@ -38,11 +38,11 @@ func (m *Mysql) GetDBInstance() any {
 func (m *Mysql) Conn() {
 	var err error
 
-	m.host = config.Cfg.Section("MYSQL").Key("host").String()
-	m.port = config.Cfg.Section("MYSQL").Key("port").String()
-	m.user = config.Cfg.Section("MYSQL").Key("user").String()
-	m.password = config.Cfg.Section("MYSQL").Key("password").String()
-	m.database = config.Cfg.Section("MYSQL").Key("database").String()
+	m.host = conf.Cfg.Section("MYSQL").Key("host").String()
+	m.port = conf.Cfg.Section("MYSQL").Key("port").String()
+	m.user = conf.Cfg.Section("MYSQL").Key("user").String()
+	m.password = conf.Cfg.Section("MYSQL").Key("password").String()
+	m.database = conf.Cfg.Section("MYSQL").Key("database").String()
 
 	//  连接MySQL
 	dsn := m.user + ":" + m.password + "@tcp(" + m.host + ":" + m.port + ")/" + m.database + "?charset=utf8mb4&parseTime=True&loc=Local"

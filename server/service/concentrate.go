@@ -1,4 +1,4 @@
-package api
+package service
 
 import (
 	"github.com/gin-gonic/gin"
@@ -66,7 +66,7 @@ func BeginConcentrate(c *gin.Context) {
 //  @param c 上下文
 //
 func QuitConcentrate(c *gin.Context) {
-	//  实现Redis的过期回调（待
+	//  实现Redis的过期回调（待---------------------------------------------------------------------
 
 	claims, _ := c.Get("claims")
 	claimsValueElem := reflect.ValueOf(claims).Elem()
@@ -118,7 +118,7 @@ func EndConcentrate(c *gin.Context) {
 		db.Del(common.RedisKeyStudentID + strStudentID)
 		response.Success(c, "顺利结束专注状态", nil)
 
-		//  累加学生总专注时长（待
+		//  累加学生总专注时长（待--------------------------------------------------------------
 	} else {
 		//  提前结束 即QuitConcentrate()
 		var concentrate model.Concentrate

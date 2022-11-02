@@ -61,7 +61,7 @@ const login = async () => {
 }
 </script>
 
-<style>
+<style scoped>
 .h1-class-2 {
   text-align: center;
   font-size: 80px;
