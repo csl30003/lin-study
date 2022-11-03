@@ -29,18 +29,14 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import {reactive} from 'vue'
 import instance from '../axios/index'
+import { useRouter } from "vue-router"
+const router = useRouter()
 
-export default {
-  methods: {
-    home() {
-      this.$router.push({
-        path: '/home'
-      });
-    }
-  }
+const home = () => {
+  router.push('/home');
 }
 
 const form = reactive({
