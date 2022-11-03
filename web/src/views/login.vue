@@ -29,12 +29,11 @@
   </div>
 </template>
 
-<script lang="ts">
+<script>
 import {reactive} from 'vue'
 import instance from '../axios/index'
-import {defineComponent} from 'vue'
 
-export default defineComponent({
+export default {
   methods: {
     home() {
       this.$router.push({
@@ -42,7 +41,7 @@ export default defineComponent({
       });
     }
   }
-})
+}
 
 const form = reactive({
   name: '',

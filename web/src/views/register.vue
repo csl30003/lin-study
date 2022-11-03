@@ -43,10 +43,9 @@
 
 
 
-<script lang="ts" setup>
+<script setup>
 
 import { reactive, ref, onMounted } from 'vue'
-import type { FormInstance } from 'element-plus'
 import instance from '../axios/index'
 
 let tableData = ref([])
@@ -71,18 +70,18 @@ onMounted(() => {
   getStudents()
 })
 
-const formRef = ref<FormInstance>()
+const formRef = ref()
 
 const myForm = reactive({
   name: '',
 })
 
-const submitForm = (formEl: FormInstance | undefined) => {
+const submitForm = (formEl) => {
   if (!formEl) return
   addStudents()
 }
 
-const resetForm = (formEl: FormInstance | undefined) => {
+const resetForm = (formEl) => {
   if (!formEl) return
   formEl.resetFields()
 }
