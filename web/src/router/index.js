@@ -21,6 +21,14 @@ const routes = [
                 path: 'map/:floor',
                 component: () => import('../views/layer')
             },
+            {
+                path: 'map/:floor/:layer',
+                component: () => import('../views/class')
+            },
+            {
+                path: 'map/:floor/:layer/:class',
+                component: () => import('../views/seat')
+            }
         ]
     }
 ]

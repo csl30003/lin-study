@@ -1,16 +1,16 @@
 <template>
-  <el-image :src="require('@/assets/layer.png')"
+  <el-image :src="require('@/assets/class.png')"
             style="margin: 0; position:absolute; height: 100%; width: 92%"></el-image>
   <div class="div">
     <el-container class="el-container">
       <el-header class="el-header">
         <h1 class="h1">
-          {{ floor }}
+          {{ layer }}
         </h1>
       </el-header>
 
       <el-main class="el-main">
-        <el-table class="el-table" size="large" :data="layerList" :row-style="{height: '60px'}"
+        <el-table class="el-table" size="large" :data="classList" :row-style="{height: '60px'}"
                   :cell-style="{padding:'0px'}">
           <el-table-column prop="i" min-width="20%"/>
           <el-table-column prop="name" min-width="40%"/>
@@ -20,7 +20,7 @@
                   link
                   type="success"
                   size="large"
-                  @click.prevent="getClass(scope.row)"
+                  @click.prevent="getSeat(scope.row)"
                   style="font-size: 30px"
               >
                 进入
@@ -42,20 +42,21 @@ import {ElMessage} from "element-plus"
 const router = useRouter();
 
 const floor = router.currentRoute.value.params.floor
+const layer = router.currentRoute.value.params.layer
 
-const layerList = ref([])
+const classList = ref([])
 
 onMounted(() => {
-  getLayer()
+  getClass()
 })
 
-const getLayer = async () => {
-  instance.get('http://localhost:8080/index/' + floor).then(res => {
+const getClass = async () => {
+  instance.get('http://localhost:8080/index/' + floor + '/' + layer).then(res => {
     if (res.data.code === 200) {
       let temp
       temp = res.data.data
       for (let i = 0; i < temp.length; i++) {
-        layerList.value.push({
+        classList.value.push({
           'i': i + 1,
           name: temp[i]
         })
@@ -66,8 +67,8 @@ const getLayer = async () => {
   })
 }
 
-const getClass = async (row) => {
-  await router.push('/home/map/' + floor + '/' + row.name)
+const getSeat = async (row) => {
+  await router.push('/home/map/' + floor + '/' + layer + '/' + row.name)
 }
 
 

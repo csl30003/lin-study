@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-container class="el-container">
-      <el-aside width="130px">
+      <el-aside width="8%">
         <el-radio-group v-model="isCollapse" style="margin-bottom: 20px">
           <el-radio-button :label="false">详细</el-radio-button>
           <el-radio-button :label="true">缩小</el-radio-button>
@@ -52,7 +52,7 @@
       </el-aside>
 
       <el-main class="el-main">
-        <router-view></router-view>
+        <router-view style="height: 100%; width: 100%"></router-view>
       </el-main>
     </el-container>
   </div>
@@ -136,7 +136,7 @@ const logout = async () => {
 }
 
 .el-menu-vertical:not(.el-menu--collapse) {
-  width: 130px;
+  width: 100%;
   min-height: 500px;
 }
 </style>
