@@ -1,26 +1,33 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import {createRouter, createWebHistory} from 'vue-router'
 
 const routes = [
-  {
-    path: '/',
-    name: 'index',
-    component: () => import('../views/index.vue')
-  },
-  {
-    path: '/login',
-    name: 'login',
-    component: () => import('../views/login.vue')
-  },
-  {
-    path: '/register',
-    name: 'register',
-    component: () => import('../views/register')
-  }
+    {
+        path: '/',
+        component: () => import('../views/index')
+    },
+    {
+        path: '/register',
+        component: () => import('../views/register')
+    },
+    {
+        path: '/home',
+        component: () => import('../views/home'),
+        children: [
+            {
+                path: 'map',
+                component: () => import('../views/floor'),
+            },
+            {
+                path: 'map/:floor',
+                component: () => import('../views/layer')
+            },
+        ]
+    }
 ]
 
 const router = createRouter({
-  history: createWebHistory(),
-  routes
+    history: createWebHistory(),
+    routes
 })
 
 export default router

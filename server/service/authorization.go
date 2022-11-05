@@ -59,7 +59,7 @@ func Login(c *gin.Context) {
 		Expires: expirationTime,
 	})
 
-	response.Success(c, "登录成功", nil)
+	response.Success(c, "登录成功", student.Name)
 }
 
 //
@@ -72,6 +72,10 @@ func Register(c *gin.Context) {
 
 	if err := c.ShouldBindJSON(&student); err != nil {
 		response.Failed(c, "参数错误")
+		return
+	}
+	if student.Name == "" || student.Password == "" {
+		response.Failed(c, "至少需要填写用户名和密码")
 		return
 	}
 

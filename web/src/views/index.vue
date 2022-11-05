@@ -39,21 +39,34 @@
 </template>
 
 <script setup>
-import {useRouter} from "vue-router";
-import {reactive} from "vue";
+import {useRouter} from "vue-router"
+import {reactive} from "vue"
+import instance from "@/axios"
+import {ElMessage} from "element-plus"
 
-const router = useRouter();
+const router = useRouter()
 
-const login = () => {
-  router.push('/login');
-}
-const register = () => {
-  router.push('/register');
-}
 const form = reactive({
   name: '',
   password: '',
 })
+
+const login = async () => {
+  instance.post('http://localhost:8080/login', {
+    name: form.name,
+    password: form.password,
+  }).then(res => {
+    if (res.data.code === 200) {
+      router.push('/home')
+    } else {
+      ElMessage.error(res.data.message)
+    }
+  })
+}
+const register = async  () => {
+  await router.push('/register');
+}
+
 
 </script>
 
@@ -63,7 +76,7 @@ const form = reactive({
   font-size: 100px;
   transform: translateY(-50%);
   color: #ffbc37;
-  font-family: STLiti;
+  font-family: STLiti, serif;
 }
 
 .radius {
@@ -73,7 +86,7 @@ const form = reactive({
   border-radius: 20px;
   margin-top: 100px;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.5);
-  text-align:center;
+  text-align: center;
 }
 
 .el-main {

@@ -10,7 +10,7 @@ var Cfg *ini.File
 
 func init() {
 	var err error
-	Cfg, err = ini.Load("./conf/dev/conf.ini")
+	Cfg, err = ini.Load("./conf/dev/config.ini")
 	if err != nil {
 		log.Println("文件读取失败", err)
 		os.Exit(1)
