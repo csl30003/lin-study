@@ -21,7 +21,7 @@ type CollectClassroom struct {
 //  @Description: 收藏教室的一种展示结构体
 //
 type CollectClassroomTemp struct {
-	Id   uint   `json:"id"`
+	ID   uint   `json:"id"`
 	Name string `json:"name"`
 }
 

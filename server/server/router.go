@@ -62,6 +62,15 @@ func Start() {
 		i.GET("/concentrateTarget", service.GetConcentrateTarget)
 		i.POST("/concentrateTarget", service.AddConcentrateTarget)
 		i.DELETE("/concentrateTarget", service.DeleteConcentrateTarget)
+
+		i.GET("/mutualFriend", service.GetMutualFriend)
+		i.GET("/myFriend", service.GetMyFriend)
+		i.GET("/noMyFriend", service.GetNoMyFriend)
+		i.POST("/friend", service.Follow)
+		i.DELETE("/friend", service.Unfollow)
+
+		i.GET("/chat", service.GetChat)
+		i.POST("/chat", service.SendMessage)
 	}
 
 	err := e.Run(":8080")
