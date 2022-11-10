@@ -1,14 +1,18 @@
 package service
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"server/response"
+	"server/tool"
+)
 
 //
-// GetChat
-//  @Description: 获取聊天记录
+// GetPublicKey
+//  @Description: 获取公钥
 //  @param c 上下文
 //
-func GetChat(c *gin.Context) {
-
+func GetPublicKey(c *gin.Context) {
+	response.Success(c, "获取公钥成功", tool.PublicKeyStr)
 }
 
 //
@@ -17,5 +21,14 @@ func GetChat(c *gin.Context) {
 //  @param c 上下文
 //
 func SendMessage(c *gin.Context) {
+
+}
+
+//
+// GetChat
+//  @Description: 获取聊天记录
+//  @param c 上下文
+//
+func GetChat(c *gin.Context) {
 
 }

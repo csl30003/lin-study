@@ -69,8 +69,9 @@ func Start() {
 		i.POST("/friend", service.Follow)
 		i.DELETE("/friend", service.Unfollow)
 
-		i.GET("/chat", service.GetChat)
+		i.GET("/getPublicKey", service.GetPublicKey)
 		i.POST("/chat", service.SendMessage)
+		i.GET("/chat", service.GetChat)
 	}
 
 	err := e.Run(":8080")
