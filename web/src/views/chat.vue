@@ -9,7 +9,43 @@
       </el-aside>
 
       <el-main class="el-main">
+        <div class="chat-content">
 
+          <div v-for="(chat, index) in chatList" :key="index">
+            <!-- 对方 -->
+            <div class="your-word" v-if="chat.recipient_id === student.id">
+              <div class="your-info">
+                <div class="your-info-content">{{ chat.chat_content }}</div>
+                <div class="your-time">
+                  {{ chat.created_at }}
+                </div>
+              </div>
+            </div>
+
+            <!-- 我的 -->
+            <div class="my-word" v-else>
+              <div class="my-info">
+                <div class="my-info-content">{{ chat.chat_content }}</div>
+                <div class="my-time">
+                  {{ chat.created_at }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <el-input
+            class="el-input"
+            v-model="form.chat_content"
+            :autosize="{ minRows: 5, maxRows: 10 }"
+            type="textarea"
+            placeholder="请输入"
+            clearable
+        />
+        <el-button class="el-button" type="success" @click="sendMessageTest">发送</el-button>
+        <div>
+
+        </div>
       </el-main>
     </el-container>
   </div>
@@ -17,7 +53,7 @@
 
 <script setup>
 
-import {getCurrentInstance, onMounted, reactive, ref} from "vue";
+import {onMounted, reactive, ref} from "vue";
 import instance from "@/axios";
 import {ElMessage} from "element-plus";
 import {JSEncrypt} from 'jsencrypt';
@@ -25,6 +61,11 @@ import {JSEncrypt} from 'jsencrypt';
 let friendList = ref([])
 let serverPublicKey = ref()
 let chatList = ref([])
+let student = reactive({
+  id: '',
+  name: '',
+})
+
 // 无奈之举，.env配置文件里不能读取换行的字符串，加上\n又不能识别到，这是最笨的解决方法了，尽力了，前端不是很会。
 let PRIVATE_KEY = process.env.VUE_APP_PRIVATE_KEY1 + "\n" +
     process.env.VUE_APP_PRIVATE_KEY2 + "\n" +
@@ -53,11 +94,12 @@ const form = reactive({
   recipient_id: 0,
   chat_content: '',
 })
-const {appContext} = getCurrentInstance()
+
 
 onMounted(() => {
   getFriend()
   getPublicKey()
+  getStudent()
 })
 
 const getFriend = async () => {
@@ -67,7 +109,7 @@ const getFriend = async () => {
         friendList.value.push(datum)
       }
     } else {
-      ElMessage.error('无法获取好友')
+      ElMessage.error('无法获取你的信息')
     }
   })
 }
@@ -82,7 +124,19 @@ const getPublicKey = async () => {
   })
 }
 
+const getStudent = async () => {
+  instance.get('http://localhost:8080/index/getStudentInfo').then(res => {
+    if (res.data.code === 200) {
+      student.id = res.data.data.id
+      student.name = res.data.data.name
+    } else {
+      ElMessage.error('无法获取好友')
+    }
+  })
+}
+
 const getChat = async (row) => {
+  form.recipient_id = row.id
   instance.post('http://localhost:8080/index/getChat', {
     recipient_id: row.id,
     public_key: PUBLIC_KEY,
@@ -93,26 +147,26 @@ const getChat = async (row) => {
         datum.chat_content = RSADecrypt(datum.chat_content)
         chatList.value.push(datum)
       }
-      console.log(chatList)
     } else {
-      ElMessage.error(res.data.message)
+      chatList.value = []
     }
   })
 }
 
 const sendMessageTest = async () => {
-  // let chat_content = RSAEncrypt(form.chat_content)
-
-  let chat_content = RSAEncrypt("hi")
+  let chat_content = RSAEncrypt(form.chat_content)
 
   instance.post('http://localhost:8080/index/chat', {
-    // recipient_id: parseInt(form.recipient_id),
-    // chat_content: chat_content,
-    recipient_id: 2,
+    recipient_id: parseInt(form.recipient_id),
     chat_content: chat_content,
   }).then(res => {
     if (res.data.code === 200) {
-      ElMessage.error(res.data.message)
+      form.chat_content = ''
+
+      ElMessage({
+        message: res.data.message,
+        type: 'success',
+      })
     } else {
       ElMessage.error(res.data.message)
     }
@@ -121,8 +175,8 @@ const sendMessageTest = async () => {
 
 function RSAEncrypt(plainText) {
   let jse = new JSEncrypt();
-  jse.setPublicKey(serverPublicKey); // 设置 加密公钥
-  return jse.encrypt(plainText); // 进行加密
+  jse.setPublicKey(serverPublicKey);
+  return jse.encrypt(plainText);
 }
 
 function RSADecrypt(cipherText) {
@@ -130,10 +184,12 @@ function RSADecrypt(cipherText) {
   jse.setPrivateKey(PRIVATE_KEY);
   return jse.decrypt(cipherText);
 }
+
 </script>
 
 <style scoped>
 .el-container {
+  width: 100%;
   height: 100%;
 }
 
@@ -152,5 +208,125 @@ function RSADecrypt(cipherText) {
 
 ::v-deep .el-table .cell {
   line-height: 5vw;
+}
+
+.chat-content {
+  margin-top: 3%;
+  margin-left: 3%;
+  margin-right: 3%;
+  width: 94%;
+  padding: 0;
+  background-color: #f5f5f5;
+  height: 67%;
+  overflow: auto;
+}
+
+.your-word {
+  display: flex;
+  margin-bottom: 60px;
+}
+
+.your-info {
+  width: 47%;
+  margin-left: 10px;
+}
+
+.your-time {
+  font-size: 12px;
+  color: rgba(51, 51, 51, 0.8);
+  margin: 0;
+  height: 20px;
+  line-height: 20px;
+  /*margin-top: -5px;*/
+  /*margin-top: 5px;*/
+}
+
+.your-info-content {
+  word-break: break-all;
+  /*max-width: 45 %;*/
+  display: inline-block;
+  padding: 10px;
+  font-size: 17px;
+  background: #fff;
+  position: relative;
+  margin-top: 8px;
+  /*background: #dbdbdb;*/
+  border-radius: 4px;
+}
+
+/*小三角形*/
+.your-info-content::before {
+  position: absolute;
+  left: -8px;
+  top: 8px;
+  content: "";
+  border-right: 10px solid #fff;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+}
+
+
+.my-word {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 60px;
+}
+
+.my-info {
+  width: 90%;
+  /*margin-left: 10 px;*/
+  text-align: right;
+  /*position: relative;*/
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  flex-direction: column;
+}
+
+
+.my-info-content {
+  word-break: break-all;
+  max-width: 45%;
+  padding: 10px;
+  font-size: 17px;
+  /*float: right;*/
+  margin-right: 10px;
+  position: relative;
+  margin-top: 8px;
+  background: #95ec69;
+  text-align: left;
+  border-radius: 4px;
+}
+
+.my-time {
+  padding-right: 12px;
+  padding-top: 5px;
+  font-size: 12px;
+  color: rgba(51, 51, 51, 0.8);
+  margin: 0;
+  height: 20px;
+}
+
+
+.my-info-content::after {
+  position: absolute;
+  right: -8px;
+  top: 8px;
+  content: "";
+  border-left: 10px solid #95ec69;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+}
+
+.el-input {
+  margin-left: 3%;
+  margin-right: 3%;
+  width: 94%;
+}
+
+.el-button {
+  margin-left: 87%;
+  width: 10%;
+  height: 5%;
 }
 </style>
