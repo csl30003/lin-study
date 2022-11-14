@@ -24,7 +24,7 @@
             <template #title>同学</template>
           </el-menu-item>
 
-          <el-menu-item index="3">
+          <el-menu-item index="3" @click="chat">
             <el-icon><ChatLineSquare /></el-icon>
             <template #title>纸条</template>
           </el-menu-item>
@@ -104,6 +104,10 @@ const getStudentInfo = async ()  => {
 
 const floor = async () => {
   await router.push('/home/map')
+}
+
+const chat = async () => {
+  await router.push('/home/chat')
 }
 
 const logout = async () => {

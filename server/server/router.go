@@ -71,7 +71,7 @@ func Start() {
 
 		i.GET("/getPublicKey", service.GetPublicKey)
 		i.POST("/chat", service.SendMessage)
-		i.GET("/chat", service.GetChat)
+		i.POST("/getChat", service.GetChat)
 	}
 
 	err := e.Run(":8080")

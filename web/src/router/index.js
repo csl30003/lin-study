@@ -28,6 +28,10 @@ const routes = [
             {
                 path: 'map/:floor/:layer/:class',
                 component: () => import('../views/seat')
+            },
+            {
+                path: 'chat',
+                component: () => import('../views/chat')
             }
         ]
     }

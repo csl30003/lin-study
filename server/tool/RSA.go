@@ -19,7 +19,7 @@ var (
 //
 func init() {
 	//  使用随机数据生成器random生成一对具有指定字位数的RSA密钥
-	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
+	privateKey, err := rsa.GenerateKey(rand.Reader, 1024)
 	if err != nil {
 		panic(err)
 	}
@@ -32,10 +32,10 @@ func init() {
 	PrivateKeyStr = string(pem.EncodeToMemory(privateBlock))
 
 	//  获取公钥的数据
-	publicKey := privateKey.PublicKey
+	publicKey := &privateKey.PublicKey
 
 	//  X509对公钥编码
-	X509PublicKey, err := x509.MarshalPKIXPublicKey(&publicKey)
+	X509PublicKey, err := x509.MarshalPKIXPublicKey(publicKey)
 	if err != nil {
 		panic(err)
 	}
@@ -52,9 +52,9 @@ func init() {
 //  @return []byte
 //  @return error
 //
-func RSAEncrypt(plainText []byte) ([]byte, error) {
+func RSAEncrypt(plainText []byte, publicKeyStr string) ([]byte, error) {
 	//pem解码
-	block, _ := pem.Decode([]byte(PublicKeyStr))
+	block, _ := pem.Decode([]byte(publicKeyStr))
 	if block == nil {
 		return nil, errors.New("public key error")
 	}
@@ -79,9 +79,9 @@ func RSAEncrypt(plainText []byte) ([]byte, error) {
 //  @return []byte
 //  @return error
 //
-func RSADecrypt(cipherText []byte) ([]byte, error) {
+func RSADecrypt(cipherText []byte, privateKeyStr string) ([]byte, error) {
 	//pem解码
-	block, _ := pem.Decode([]byte(PrivateKeyStr))
+	block, _ := pem.Decode([]byte(privateKeyStr))
 	if block == nil {
 		return nil, errors.New("private key error")
 	}
