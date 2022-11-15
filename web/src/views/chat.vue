@@ -3,13 +3,13 @@
     <el-container class="el-container">
       <el-aside width="20%">
         <el-table class="el-table" :data="friendList" size="large" :row-style="{height: '100%'}"
-                  :cell-style="{padding:'0px'}" @row-click="getChat">
+                  :cell-style="{padding:'0px'}" @row-click="getChatByRow">
           <el-table-column prop="name" lable="用户名" min-width="100%" align="center"/>
         </el-table>
       </el-aside>
 
       <el-main class="el-main">
-        <div class="chat-content">
+        <div class="chat-content" id="chat-content">
 
           <div v-for="(chat, index) in chatList" :key="index">
             <!-- 对方 -->
@@ -53,7 +53,7 @@
 
 <script setup>
 
-import {onMounted, reactive, ref} from "vue";
+import {nextTick, onMounted, onUpdated, reactive, ref} from "vue";
 import instance from "@/axios";
 import {ElMessage} from "element-plus";
 import {JSEncrypt} from 'jsencrypt';
@@ -95,7 +95,6 @@ const form = reactive({
   chat_content: '',
 })
 
-
 onMounted(() => {
   getFriend()
   getPublicKey()
@@ -135,14 +134,17 @@ const getStudent = async () => {
   })
 }
 
-const getChat = async (row) => {
+const getChatByRow = async (row) => {
   form.recipient_id = row.id
   instance.post('http://localhost:8080/index/getChat', {
     recipient_id: row.id,
     public_key: PUBLIC_KEY,
-  }).then(res => {
+  }).then(async res => {
     if (res.data.code === 200) {
+      //  清空聊天记录
       chatList.value = []
+
+      //  装填聊天记录
       for (const datum of res.data.data) {
         datum.chat_content = RSADecrypt(datum.chat_content)
         chatList.value.push(datum)
@@ -150,6 +152,39 @@ const getChat = async (row) => {
     } else {
       chatList.value = []
     }
+
+    //  跳到聊天页面最下边
+    await nextTick()
+    const div = document.getElementById('chat-content');
+    console.log(div.scrollHeight)
+    div.scrollTop = div.scrollHeight
+  })
+}
+
+const getChatByID = async (id) => {
+  form.recipient_id = id
+  instance.post('http://localhost:8080/index/getChat', {
+    recipient_id: id,
+    public_key: PUBLIC_KEY,
+  }).then(async res => {
+    if (res.data.code === 200) {
+      //  清空聊天记录
+      chatList.value = []
+
+      //  装填聊天记录
+      for (const datum of res.data.data) {
+        datum.chat_content = RSADecrypt(datum.chat_content)
+        chatList.value.push(datum)
+      }
+    } else {
+      chatList.value = []
+    }
+
+    //  跳到聊天页面最下边
+    await nextTick()
+    const div = document.getElementById('chat-content');
+    console.log(div.scrollHeight)
+    div.scrollTop = div.scrollHeight
   })
 }
 
@@ -170,6 +205,9 @@ const sendMessageTest = async () => {
     } else {
       ElMessage.error(res.data.message)
     }
+
+    //  刷新一下聊天记录，其实应该用websocket的，但是时间所剩无几
+    getChatByID(parseInt(form.recipient_id))
   })
 }
 

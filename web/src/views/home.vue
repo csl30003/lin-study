@@ -8,7 +8,6 @@
         </el-radio-group>
 
         <el-menu
-            default-active="1"
             class="el-menu-vertical"
             :collapse="isCollapse"
             @open="handleOpen"
@@ -19,7 +18,7 @@
             <template #title>地图</template>
           </el-menu-item>
 
-          <el-menu-item index="2">
+          <el-menu-item index="2" @click="friend">
             <el-icon><Sugar /></el-icon>
             <template #title>同学</template>
           </el-menu-item>
@@ -104,6 +103,10 @@ const getStudentInfo = async ()  => {
 
 const floor = async () => {
   await router.push('/home/map')
+}
+
+const friend = async () => {
+  await router.push('/home/friend')
 }
 
 const chat = async () => {
