@@ -1,43 +1,462 @@
 <template>
-  <el-radio-group v-model="tabPosition" style="margin-bottom: 30px">
-    <el-radio-button label="top">top</el-radio-button>
-    <el-radio-button label="right">right</el-radio-button>
-    <el-radio-button label="bottom">bottom</el-radio-button>
-    <el-radio-button label="left">left</el-radio-button>
-  </el-radio-group>
+  <el-tabs v-model="activeName" class="el-tabs" @tab-click="handleClick" type="border-card" stretch>
 
-  <el-tabs v-model="activeName" class="el-tabs" @tab-click="handleClick" type="border-card" stretch :tab-position="tabPosition">
-    <el-tab-pane label="User" name="first">
-      <el-row>
-        <el-card class="box-card">
-          <template #header>
-            <div class="card-header">
-              <span>Card name</span>
-              <el-button class="button" text>Operation button</el-button>
+    <el-tab-pane class="el-tab-pane" label="相互的朋友" name="mutualFriend">
+
+      <el-descriptions
+          class="el-descriptions"
+          v-for="(friend, index) in friendList" :key="index"
+          :column="3"
+          :size="'large'"
+          border
+
+      >
+        <el-descriptions-item>
+          <template #label>
+            <div class="cell-item">
+              <el-icon>
+                <UserFilled/>
+              </el-icon>
+              昵称
             </div>
           </template>
-          <div v-for="o in 4" :key="o" class="text item">{{ 'List item ' + o }}</div>
-        </el-card>
-      </el-row>
+          {{ friend.name }}
+        </el-descriptions-item>
+
+        <el-descriptions-item>
+          <template #label>
+            <div class="cell-item">
+              <el-icon><Tickets /></el-icon>
+              目标
+            </div>
+          </template>
+          {{ friend.goal }}
+        </el-descriptions-item>
+
+        <el-descriptions-item>
+          <template #label>
+            <div class="cell-item">
+              <el-icon><CollectionTag /></el-icon>
+              标签
+            </div>
+          </template>
+          {{ friend.label }}
+        </el-descriptions-item>
+
+        <el-descriptions-item>
+          <template #label>
+            <div class="cell-item">
+              <el-icon v-if="friend.sex === '男'">
+                <Male/>
+              </el-icon>
+              <el-icon v-else>
+                <Female/>
+              </el-icon>
+              性别
+            </div>
+          </template>
+          {{ friend.sex }}
+        </el-descriptions-item>
+
+        <el-descriptions-item>
+          <template #label>
+            <div class="cell-item">
+              <el-icon>
+                <Clock/>
+              </el-icon>
+              总专注时长
+            </div>
+          </template>
+          {{ friend.accumulated_concentrate_time }}
+        </el-descriptions-item>
+
+        <el-descriptions-item>
+          <template #label>
+            <div class="cell-item">
+              <el-icon>
+                <More/>
+              </el-icon>
+              操作
+            </div>
+          </template>
+          <el-button type="primary">深入了解</el-button>
+          <el-button type="info">传递纸条</el-button>
+          <el-button type="danger">狠心绝交</el-button>
+        </el-descriptions-item>
+      </el-descriptions>
+
     </el-tab-pane>
-    <el-tab-pane label="Config" name="second">Config</el-tab-pane>
-    <el-tab-pane label="Role" name="third">Role</el-tab-pane>
-    <el-tab-pane label="Task" name="fourth">Task</el-tab-pane>
+
+    <el-tab-pane label="想交的朋友" name="myFriend">
+
+      <el-descriptions
+          class="el-descriptions"
+          v-for="(friend, index) in friendList" :key="index"
+          :column="3"
+          :size="'large'"
+          border
+
+      >
+        <el-descriptions-item>
+          <template #label>
+            <div class="cell-item">
+              <el-icon>
+                <UserFilled/>
+              </el-icon>
+              昵称
+            </div>
+          </template>
+          {{ friend.name }}
+        </el-descriptions-item>
+
+        <el-descriptions-item>
+          <template #label>
+            <div class="cell-item">
+              <el-icon><Tickets /></el-icon>
+              目标
+            </div>
+          </template>
+          {{ friend.goal }}
+        </el-descriptions-item>
+
+        <el-descriptions-item>
+          <template #label>
+            <div class="cell-item">
+              <el-icon><CollectionTag /></el-icon>
+              标签
+            </div>
+          </template>
+          {{ friend.label }}
+        </el-descriptions-item>
+
+        <el-descriptions-item>
+          <template #label>
+            <div class="cell-item">
+              <el-icon v-if="friend.sex === '男'">
+                <Male/>
+              </el-icon>
+              <el-icon v-else>
+                <Female/>
+              </el-icon>
+              性别
+            </div>
+          </template>
+          {{ friend.sex }}
+        </el-descriptions-item>
+
+        <el-descriptions-item>
+          <template #label>
+            <div class="cell-item">
+              <el-icon>
+                <Clock/>
+              </el-icon>
+              总专注时长
+            </div>
+          </template>
+          {{ friend.accumulated_concentrate_time }}
+        </el-descriptions-item>
+
+        <el-descriptions-item>
+          <template #label>
+            <div class="cell-item">
+              <el-icon>
+                <More/>
+              </el-icon>
+              操作
+            </div>
+          </template>
+          <el-button type="primary">深入了解</el-button>
+          <el-button type="info">传递纸条</el-button>
+          <el-button type="danger">狠心绝交</el-button>
+        </el-descriptions-item>
+      </el-descriptions>
+
+    </el-tab-pane>
+
+    <el-tab-pane label="想认识我的人" name="noMyFriend">
+
+      <el-descriptions
+          class="el-descriptions"
+          v-for="(friend, index) in friendList" :key="index"
+          :column="3"
+          :size="'large'"
+          border
+
+      >
+        <el-descriptions-item>
+          <template #label>
+            <div class="cell-item">
+              <el-icon>
+                <UserFilled/>
+              </el-icon>
+              昵称
+            </div>
+          </template>
+          {{ friend.name }}
+        </el-descriptions-item>
+
+        <el-descriptions-item>
+          <template #label>
+            <div class="cell-item">
+              <el-icon><Tickets /></el-icon>
+              目标
+            </div>
+          </template>
+          {{ friend.goal }}
+        </el-descriptions-item>
+
+        <el-descriptions-item>
+          <template #label>
+            <div class="cell-item">
+              <el-icon><CollectionTag /></el-icon>
+              标签
+            </div>
+          </template>
+          {{ friend.label }}
+        </el-descriptions-item>
+
+        <el-descriptions-item>
+          <template #label>
+            <div class="cell-item">
+              <el-icon v-if="friend.sex === '男'">
+                <Male/>
+              </el-icon>
+              <el-icon v-else>
+                <Female/>
+              </el-icon>
+              性别
+            </div>
+          </template>
+          {{ friend.sex }}
+        </el-descriptions-item>
+
+        <el-descriptions-item>
+          <template #label>
+            <div class="cell-item">
+              <el-icon>
+                <Clock/>
+              </el-icon>
+              总专注时长
+            </div>
+          </template>
+          {{ friend.accumulated_concentrate_time }}
+        </el-descriptions-item>
+
+        <el-descriptions-item>
+          <template #label>
+            <div class="cell-item">
+              <el-icon>
+                <More/>
+              </el-icon>
+              操作
+            </div>
+          </template>
+          <el-button type="primary">深入了解</el-button>
+          <el-button type="info">传递纸条</el-button>
+          <el-button type="danger">狠心绝交</el-button>
+        </el-descriptions-item>
+      </el-descriptions>
+
+    </el-tab-pane>
+
+    <el-tab-pane label="搜索" name="search">
+      <el-row>
+        <el-col :offset="7">
+          <el-input class="search-input" v-model="search" placeholder="输入用户名" clearable />
+          <el-button :icon="Search" circle @click="searchStudent"/>
+        </el-col>
+      </el-row>
+
+      <el-descriptions
+          class="el-descriptions"
+          v-for="(friend, index) in friendList" :key="index"
+          :column="3"
+          :size="'large'"
+          border
+
+      >
+        <el-descriptions-item>
+          <template #label>
+            <div class="cell-item">
+              <el-icon>
+                <UserFilled/>
+              </el-icon>
+              昵称
+            </div>
+          </template>
+          {{ friend.name }}
+        </el-descriptions-item>
+
+        <el-descriptions-item>
+          <template #label>
+            <div class="cell-item">
+              <el-icon><Tickets /></el-icon>
+              目标
+            </div>
+          </template>
+          {{ friend.goal }}
+        </el-descriptions-item>
+
+        <el-descriptions-item>
+          <template #label>
+            <div class="cell-item">
+              <el-icon><CollectionTag /></el-icon>
+              标签
+            </div>
+          </template>
+          {{ friend.label }}
+        </el-descriptions-item>
+
+        <el-descriptions-item>
+          <template #label>
+            <div class="cell-item">
+              <el-icon v-if="friend.sex === '男'">
+                <Male/>
+              </el-icon>
+              <el-icon v-else>
+                <Female/>
+              </el-icon>
+              性别
+            </div>
+          </template>
+          {{ friend.sex }}
+        </el-descriptions-item>
+
+        <el-descriptions-item>
+          <template #label>
+            <div class="cell-item">
+              <el-icon>
+                <Clock/>
+              </el-icon>
+              总专注时长
+            </div>
+          </template>
+          {{ friend.accumulated_concentrate_time }}
+        </el-descriptions-item>
+
+        <el-descriptions-item>
+          <template #label>
+            <div class="cell-item">
+              <el-icon>
+                <More/>
+              </el-icon>
+              操作
+            </div>
+          </template>
+          <el-button type="primary">深入了解</el-button>
+          <el-button type="info">传递纸条</el-button>
+          <el-button type="danger">狠心绝交</el-button>
+        </el-descriptions-item>
+      </el-descriptions>
+
+    </el-tab-pane>
+
   </el-tabs>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-const tabPosition = ref('top')
+import {ref} from 'vue'
+import instance from "@/axios";
+import {ElMessage} from "element-plus";
+import {
+  UserFilled,
+  Male,
+  Female,
+  Clock,
+  More,
+  CollectionTag,
+  Tickets,
+  Search
+} from '@element-plus/icons-vue'
 
-const activeName = ref('first')
+const activeName = ref('')
 
-const handleClick = (tab, event) => {
-  console.log(tab, event)
-  console.log(activeName)
+let friendList = ref([])
+
+const search = ref('')
+
+const handleClick = (tab) => {
+  friendList.value = []
+
+  if (tab.paneName === "mutualFriend") {
+    instance.get('http://localhost:8080/index/mutualFriend').then(res => {
+      if (res.data.code === 200 && res.data.data != null) {
+        for (const datum of res.data.data) {
+          if (datum.sex === 0) {
+            datum.sex = "男"
+          } else {
+            datum.sex = "女"
+          }
+          friendList.value.push(datum)
+        }
+      } else {
+        ElMessage.error(res.data.message)
+      }
+    })
+  } else if (tab.paneName === "myFriend") {
+    instance.get('http://localhost:8080/index/myFriend').then(res => {
+      if (res.data.code === 200 && res.data.data != null) {
+        for (const datum of res.data.data) {
+          if (datum.sex === 0) {
+            datum.sex = "男"
+          } else {
+            datum.sex = "女"
+          }
+          friendList.value.push(datum)
+        }
+      } else {
+        ElMessage.error(res.data.message)
+      }
+    })
+  } else if (tab.paneName === "noMyFriend") {
+    instance.get('http://localhost:8080/index/noMyFriend').then(res => {
+      if (res.data.code === 200 && res.data.data != null) {
+        for (const datum of res.data.data) {
+          if (datum.sex === 0) {
+            datum.sex = "男"
+          } else {
+            datum.sex = "女"
+          }
+          friendList.value.push(datum)
+        }
+      } else {
+        ElMessage.error(res.data.message)
+      }
+    })
+  }
+}
+
+const searchStudent = async () => {
+  friendList.value = []
+  instance.get('http://localhost:8080/index/searchStudent', {
+    params: {
+      searchContext: search.value
+    }
+  }).then(res => {
+    if (res.data.code === 200 && res.data.data != null) {
+      for (const datum of res.data.data) {
+        if (datum.sex === 0) {
+          datum.sex = "男"
+        } else {
+          datum.sex = "女"
+        }
+        friendList.value.push(datum)
+      }
+    } else {
+      ElMessage.error(res.data.message)
+    }
+  })
 }
 </script>
 
 <style scoped>
+.el-descriptions {
+  margin-top: 10px;
+}
 
+.search-input {
+  width: 40%;
+  height: 50px;
+  margin-right: 5px;
+}
 </style>

@@ -43,9 +43,6 @@
             clearable
         />
         <el-button class="el-button" type="success" @click="sendMessageTest">发送</el-button>
-        <div>
-
-        </div>
       </el-main>
     </el-container>
   </div>
