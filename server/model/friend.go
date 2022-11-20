@@ -68,7 +68,7 @@ func GetFriendByStudentID(studentID, mutual uint) ([]FriendTemp, bool) {
 func GetFriendByObjectID(objectID uint) ([]FriendTemp, bool) {
 	db := database.GetMysqlDBInstance()
 	var friendTempSlice []FriendTemp
-	rows, err := db.Model(&Friend{}).Select("friends.object_id as id, students.name, students.label, students.sex, students.goal, students.accumulated_concentrate_time").Joins("left join students on friends.student_id = students.id").Where("friends.object_id = ? and friends.is_mutual = 0", objectID).Rows()
+	rows, err := db.Model(&Friend{}).Select("friends.student_id as id, students.name, students.label, students.sex, students.goal, students.accumulated_concentrate_time").Joins("left join students on friends.student_id = students.id").Where("friends.object_id = ? and friends.is_mutual = 0", objectID).Rows()
 	if err != nil {
 		return nil, false
 	}

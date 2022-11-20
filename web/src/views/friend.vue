@@ -26,7 +26,9 @@
         <el-descriptions-item>
           <template #label>
             <div class="cell-item">
-              <el-icon><Tickets /></el-icon>
+              <el-icon>
+                <Tickets/>
+              </el-icon>
               目标
             </div>
           </template>
@@ -36,7 +38,9 @@
         <el-descriptions-item>
           <template #label>
             <div class="cell-item">
-              <el-icon><CollectionTag /></el-icon>
+              <el-icon>
+                <CollectionTag/>
+              </el-icon>
               标签
             </div>
           </template>
@@ -79,9 +83,9 @@
               操作
             </div>
           </template>
-          <el-button type="primary">深入了解</el-button>
+          <el-button type="primary" @click="deepenUnderstanding(friend.id)">深入了解</el-button>
           <el-button type="info">传递纸条</el-button>
-          <el-button type="danger">狠心绝交</el-button>
+          <el-button type="danger" @click="breakOffRelations(friend.id)">狠心绝交</el-button>
         </el-descriptions-item>
       </el-descriptions>
 
@@ -112,7 +116,9 @@
         <el-descriptions-item>
           <template #label>
             <div class="cell-item">
-              <el-icon><Tickets /></el-icon>
+              <el-icon>
+                <Tickets/>
+              </el-icon>
               目标
             </div>
           </template>
@@ -122,7 +128,9 @@
         <el-descriptions-item>
           <template #label>
             <div class="cell-item">
-              <el-icon><CollectionTag /></el-icon>
+              <el-icon>
+                <CollectionTag/>
+              </el-icon>
               标签
             </div>
           </template>
@@ -166,8 +174,7 @@
             </div>
           </template>
           <el-button type="primary">深入了解</el-button>
-          <el-button type="info">传递纸条</el-button>
-          <el-button type="danger">狠心绝交</el-button>
+          <el-button type="danger" @click="breakOffRelations(friend.id)">狠心绝交</el-button>
         </el-descriptions-item>
       </el-descriptions>
 
@@ -198,7 +205,9 @@
         <el-descriptions-item>
           <template #label>
             <div class="cell-item">
-              <el-icon><Tickets /></el-icon>
+              <el-icon>
+                <Tickets/>
+              </el-icon>
               目标
             </div>
           </template>
@@ -208,7 +217,9 @@
         <el-descriptions-item>
           <template #label>
             <div class="cell-item">
-              <el-icon><CollectionTag /></el-icon>
+              <el-icon>
+                <CollectionTag/>
+              </el-icon>
               标签
             </div>
           </template>
@@ -252,8 +263,7 @@
             </div>
           </template>
           <el-button type="primary">深入了解</el-button>
-          <el-button type="info">传递纸条</el-button>
-          <el-button type="danger">狠心绝交</el-button>
+          <el-button type="success" @click="makeFriend(friend.id)">交个朋友</el-button>
         </el-descriptions-item>
       </el-descriptions>
 
@@ -262,7 +272,7 @@
     <el-tab-pane label="搜索" name="search">
       <el-row>
         <el-col :offset="7">
-          <el-input class="search-input" v-model="search" placeholder="输入用户名" clearable />
+          <el-input class="search-input" v-model="search" placeholder="输入用户名" clearable/>
           <el-button :icon="Search" circle @click="searchStudent"/>
         </el-col>
       </el-row>
@@ -290,7 +300,9 @@
         <el-descriptions-item>
           <template #label>
             <div class="cell-item">
-              <el-icon><Tickets /></el-icon>
+              <el-icon>
+                <Tickets/>
+              </el-icon>
               目标
             </div>
           </template>
@@ -300,7 +312,9 @@
         <el-descriptions-item>
           <template #label>
             <div class="cell-item">
-              <el-icon><CollectionTag /></el-icon>
+              <el-icon>
+                <CollectionTag/>
+              </el-icon>
               标签
             </div>
           </template>
@@ -344,18 +358,18 @@
             </div>
           </template>
           <el-button type="primary">深入了解</el-button>
-          <el-button type="info">传递纸条</el-button>
-          <el-button type="danger">狠心绝交</el-button>
+          <el-button type="success" @click="makeFriend(friend.id)">交个朋友</el-button>
         </el-descriptions-item>
       </el-descriptions>
 
     </el-tab-pane>
 
   </el-tabs>
+
 </template>
 
 <script setup>
-import {ref} from 'vue'
+import {nextTick, reactive, ref} from 'vue'
 import instance from "@/axios";
 import {ElMessage} from "element-plus";
 import {
@@ -368,12 +382,31 @@ import {
   Tickets,
   Search
 } from '@element-plus/icons-vue'
+import {CircleCloseFilled} from '@element-plus/icons-vue'
+import router from "@/router";
 
 const activeName = ref('')
 
 let friendList = ref([])
 
 const search = ref('')
+
+let student = reactive({
+  id: 0,
+  name: "",
+  label: "",
+  sex: 0,
+  area: "",
+  stage: "",
+  school: "",
+  goal: "",
+  total_study_day: 0,
+  continuous_study_day: 0,
+  accumulated_concentrate_time: 0,
+  inspired: 0,
+  inspire: 0,
+  status: 0
+})
 
 const handleClick = (tab) => {
   friendList.value = []
@@ -433,7 +466,7 @@ const searchStudent = async () => {
       searchContext: search.value
     }
   }).then(res => {
-    if (res.data.code === 200 && res.data.data != null) {
+    if (res.data.code === 200) {
       for (const datum of res.data.data) {
         if (datum.sex === 0) {
           datum.sex = "男"
@@ -446,6 +479,51 @@ const searchStudent = async () => {
       ElMessage.error(res.data.message)
     }
   })
+}
+
+//  暂时无法解决
+const deepenUnderstanding = async (id) => {
+  student = null
+
+  instance.get('http://localhost:8080/index/student', {
+    params: {
+      id: id
+    }
+  }).then(res => {
+    if (res.data.code === 200) {
+      student = res.data.data
+    } else {
+      ElMessage.error(res.data.message)
+    }
+  })
+}
+
+const makeFriend = async (id) => {
+  instance.post('http://localhost:8080/index/friend', {
+    object_id: id
+  }).then(res => {
+    if (res.data.code === 200) {
+      ElMessage.success(res.data.message)
+    } else {
+      ElMessage.error(res.data.message)
+    }
+  })
+  await router.push('/home/map')
+  await router.push('/home/friend')
+}
+
+const breakOffRelations = async (id) => {
+  instance.delete('http://localhost:8080/index/friend', {
+    data: {object_id: id}
+  }).then(res => {
+    if (res.data.code === 200) {
+      ElMessage.success(res.data.message)
+    } else {
+      ElMessage.error(res.data.message)
+    }
+  })
+  await router.push('/home/map')
+  await router.push('/home/friend')
 }
 </script>
 

@@ -74,6 +74,7 @@ func Start() {
 		i.POST("/getChat", service.GetChat)
 
 		i.GET("/searchStudent", service.SearchStudent)
+		i.GET("/student", service.GetStudent)
 	}
 
 	err := e.Run(":8080")

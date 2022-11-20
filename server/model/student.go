@@ -28,6 +28,36 @@ type Student struct {
 	Status                     int8   `gorm:"column:status;type:tinyint(1);not null;default:0;comment:状态" json:"status"`
 }
 
+//
+// StudentTemp
+//  @Description: 学生的一种展示结构体
+//
+type StudentTemp struct {
+	ID                         uint   `json:"id"`
+	Name                       string `json:"name"`
+	Label                      string `json:"label"`
+	Sex                        int8   `json:"sex"`
+	Goal                       string `json:"goal"`
+	AccumulatedConcentrateTime int32  `json:"accumulated_concentrate_time"`
+}
+
+type StudentDetailsCanBeDisplayed struct {
+	ID                         uint   `json:"id"`
+	Name                       string `json:"name"`
+	Label                      string `json:"label"`
+	Sex                        int8   `json:"sex"`
+	Area                       string `json:"area"`
+	Stage                      string `json:"stage"`
+	School                     string `json:"school"`
+	Goal                       string `json:"goal"`
+	TotalStudyDay              int32  `json:"total_study_day"`
+	ContinuousStudyDay         int32  `json:"continuous_study_day"`
+	AccumulatedConcentrateTime int32  `json:"accumulated_concentrate_time"`
+	Inspired                   int32  `json:"inspired"`
+	Inspire                    int32  `json:"inspire"`
+	Status                     int8   `json:"status"`
+}
+
 // GetStudentByNameAndPassword
 //  @Description: 通过昵称和密码获取学生
 //  @param name 昵称
@@ -94,4 +124,48 @@ func UpdateStudentStatus(id uint, status int8) (err error) {
 	var student Student
 	err = db.Model(&student).Where("id = ?", id).Update("status", status).Error
 	return
+}
+
+//
+// GetStudentByName
+//  @Description: 通过昵称获取学生(模糊搜索)
+//  @param name 昵称
+//  @return []StudentTemp
+//  @return bool
+//
+func GetStudentByName(name string) ([]StudentTemp, bool) {
+	db := database.GetMysqlDBInstance()
+	var studentTempSlice []StudentTemp
+	rows, err := db.Model(&Student{}).Select("students.id, students.name, students.label, students.sex, students.goal, students.accumulated_concentrate_time").Where("students.name like ?", "%"+name+"%").Rows()
+	if err != nil {
+		return nil, false
+	}
+	for rows.Next() {
+		var studentTemp StudentTemp
+		err := db.ScanRows(rows, &studentTemp)
+		if err != nil {
+			return nil, false
+		}
+		studentTempSlice = append(studentTempSlice, studentTemp)
+	}
+	if len(studentTempSlice) == 0 {
+		return nil, false
+	}
+	return studentTempSlice, true
+}
+
+//
+// GetStudentByStudentID
+//  @Description: 通过学生ID获取学生
+//  @param id 学生ID
+//  @return Student
+//  @return bool
+//
+func GetStudentByStudentID(id string) (StudentDetailsCanBeDisplayed, bool) {
+	db := database.GetMysqlDBInstance()
+	var studentDetailsCanBeDisplayed StudentDetailsCanBeDisplayed
+	if err := db.Model(&Student{}).Where("students.id = ?", id).First(&studentDetailsCanBeDisplayed).Error; err != nil {
+		return studentDetailsCanBeDisplayed, false
+	}
+	return studentDetailsCanBeDisplayed, true
 }

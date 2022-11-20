@@ -153,7 +153,6 @@ const getChatByRow = async (row) => {
     //  跳到聊天页面最下边
     await nextTick()
     const div = document.getElementById('chat-content');
-    console.log(div.scrollHeight)
     div.scrollTop = div.scrollHeight
   })
 }
@@ -180,7 +179,6 @@ const getChatByID = async (id) => {
     //  跳到聊天页面最下边
     await nextTick()
     const div = document.getElementById('chat-content');
-    console.log(div.scrollHeight)
     div.scrollTop = div.scrollHeight
   })
 }
