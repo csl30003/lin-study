@@ -105,7 +105,7 @@ const getFriend = async () => {
         friendList.value.push(datum)
       }
     } else {
-      ElMessage.error('无法获取你的信息')
+      ElMessage.error('无法获取你的好友')
     }
   })
 }
@@ -126,7 +126,7 @@ const getStudent = async () => {
       student.id = res.data.data.id
       student.name = res.data.data.name
     } else {
-      ElMessage.error('无法获取好友')
+      ElMessage.error('无法获取你的消息')
     }
   })
 }

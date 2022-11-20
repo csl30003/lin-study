@@ -15,16 +15,16 @@ type Classroom struct {
 	Floor  string `gorm:"column:floor;type:varchar(20);default:'';comment:楼;index:seek" json:"floor"`
 	Layer  string `gorm:"column:layer;type:varchar(20);default:'';comment:层;index:seek" json:"layer"`
 	Class  string `gorm:"column:class;type:varchar(20);default:'';comment:班;index:seek" json:"class"`
-	Seat1  uint   `gorm:"column:seat1;not null;default:0;comment:座位1" json:"seat1"`
-	Seat2  uint   `gorm:"column:seat2;not null;default:0;comment:座位2" json:"seat2"`
-	Seat3  uint   `gorm:"column:seat3;not null;default:0;comment:座位3" json:"seat3"`
-	Seat4  uint   `gorm:"column:seat4;not null;default:0;comment:座位4" json:"seat4"`
-	Seat5  uint   `gorm:"column:seat5;not null;default:0;comment:座位5" json:"seat5"`
-	Seat6  uint   `gorm:"column:seat6;not null;default:0;comment:座位6" json:"seat6"`
-	Seat7  uint   `gorm:"column:seat7;not null;default:0;comment:座位7" json:"seat7"`
-	Seat8  uint   `gorm:"column:seat8;not null;default:0;comment:座位8" json:"seat8"`
-	Seat9  uint   `gorm:"column:seat9;not null;default:0;comment:座位9" json:"seat9"`
-	Seat10 uint   `gorm:"column:seat10;not null;default:0;comment:座位10" json:"seat10"`
+	Seat1  string `gorm:"column:seat1;type:varchar(30);not null;default:'_';comment:座位1" json:"seat1"`
+	Seat2  string `gorm:"column:seat2;type:varchar(30);not null;default:'_';comment:座位2" json:"seat2"`
+	Seat3  string `gorm:"column:seat3;type:varchar(30);not null;default:'_';comment:座位3" json:"seat3"`
+	Seat4  string `gorm:"column:seat4;type:varchar(30);not null;default:'_';comment:座位4" json:"seat4"`
+	Seat5  string `gorm:"column:seat5;type:varchar(30);not null;default:'_';comment:座位5" json:"seat5"`
+	Seat6  string `gorm:"column:seat6;type:varchar(30);not null;default:'_';comment:座位6" json:"seat6"`
+	Seat7  string `gorm:"column:seat7;type:varchar(30);not null;default:'_';comment:座位7" json:"seat7"`
+	Seat8  string `gorm:"column:seat8;type:varchar(30);not null;default:'_';comment:座位8" json:"seat8"`
+	Seat9  string `gorm:"column:seat9;type:varchar(30);not null;default:'_';comment:座位9" json:"seat9"`
+	Seat10 string `gorm:"column:seat10;type:varchar(30);not null;default:'_';comment:座位10" json:"seat10"`
 }
 
 //
@@ -83,24 +83,24 @@ func GetClassByFloorAndLayer(floor, layer string) (class []string) {
 //  @param floor 楼
 //  @param layer 层
 //  @param class 班
-//  @return map[int]uint
+//  @return map[string]string
 //
-func GetSeatByFloorAndLayerAndClass(floor, layer, class string) map[int]uint {
+func GetSeatByFloorAndLayerAndClass(floor, layer, class string) map[string]string {
 	db := database.GetMysqlDBInstance()
 	var classroom []Classroom
 	db.Where("floor = ? and layer = ? and class = ?", floor, layer, class).First(&classroom)
 
-	seat := make(map[int]uint, 10)
-	seat[1] = classroom[0].Seat1
-	seat[2] = classroom[0].Seat2
-	seat[3] = classroom[0].Seat3
-	seat[4] = classroom[0].Seat4
-	seat[5] = classroom[0].Seat5
-	seat[6] = classroom[0].Seat6
-	seat[7] = classroom[0].Seat7
-	seat[8] = classroom[0].Seat8
-	seat[9] = classroom[0].Seat9
-	seat[10] = classroom[0].Seat10
+	seat := make(map[string]string, 10)
+	seat["seat1"] = classroom[0].Seat1
+	seat["seat2"] = classroom[0].Seat2
+	seat["seat3"] = classroom[0].Seat3
+	seat["seat4"] = classroom[0].Seat4
+	seat["seat5"] = classroom[0].Seat5
+	seat["seat6"] = classroom[0].Seat6
+	seat["seat7"] = classroom[0].Seat7
+	seat["seat8"] = classroom[0].Seat8
+	seat["seat9"] = classroom[0].Seat9
+	seat["seat10"] = classroom[0].Seat10
 
 	return seat
 }
@@ -125,20 +125,20 @@ func GetClassroomID(floor, layer, class string) (uint, bool) {
 //
 // UpdateSeat
 //  @Description: 入座
-//  @param studentID 学生ID
+//  @param studentName 学生昵称
 //  @param classroomID 教室ID
 //  @param seat 座位
 //  @return bool
 //
-func UpdateSeat(studentID, classroomID uint, seat string) bool {
+func UpdateSeat(classroomID uint, studentName, seat string) bool {
 	db := database.GetMysqlDBInstance()
 	var classroom Classroom
 
 	// 事务
 	err := db.Transaction(func(tx *gorm.DB) error {
 		seatStr := "seat" + seat
-		whereStr := "id = ? and " + seatStr + " = 0"
-		result := db.Model(&classroom).Where(whereStr, classroomID).Update(seatStr, studentID)
+		whereStr := "id = ? and " + seatStr + " = '_'"
+		result := db.Model(&classroom).Where(whereStr, classroomID).Update(seatStr, studentName)
 		if result.RowsAffected == 0 {
 			return errors.New("update: no updated row")
 		}
@@ -146,7 +146,7 @@ func UpdateSeat(studentID, classroomID uint, seat string) bool {
 			return result.Error
 		}
 
-		if err := UpdateStudentStatus(studentID, 1); err != nil {
+		if err := UpdateStudentStatus(studentName, 1); err != nil {
 			return err
 		}
 		return nil
@@ -160,12 +160,12 @@ func UpdateSeat(studentID, classroomID uint, seat string) bool {
 //
 // UpdateUnseat
 //  @Description: 离座
-//  @param studentID 学生ID
+//  @param studentName 学生昵称
 //  @param classroomID 教室ID
 //  @param seat 座位
 //  @return bool
 //
-func UpdateUnseat(studentID, classroomID uint, seat string) bool {
+func UpdateUnseat(classroomID uint, studentName, seat string) bool {
 	db := database.GetMysqlDBInstance()
 	var classroom Classroom
 
@@ -173,7 +173,7 @@ func UpdateUnseat(studentID, classroomID uint, seat string) bool {
 	err := db.Transaction(func(tx *gorm.DB) error {
 		seatStr := "seat" + seat
 		whereStr := "id = ? and " + seatStr + " = ?"
-		result := db.Model(&classroom).Where(whereStr, classroomID, studentID).Update(seatStr, 0)
+		result := db.Model(&classroom).Where(whereStr, classroomID, studentName).Update(seatStr, "_")
 		if result.RowsAffected == 0 {
 			return errors.New("update: no updated row")
 		}
@@ -181,7 +181,7 @@ func UpdateUnseat(studentID, classroomID uint, seat string) bool {
 			return result.Error
 		}
 
-		if err := UpdateStudentStatus(studentID, 0); err != nil {
+		if err := UpdateStudentStatus(studentName, 0); err != nil {
 			return err
 		}
 		return nil

@@ -10,8 +10,6 @@
         <el-menu
             class="el-menu-vertical"
             :collapse="isCollapse"
-            @open="handleOpen"
-            @close="handleClose"
         >
           <el-menu-item index="1" @click="floor">
             <el-icon><School /></el-icon>

@@ -78,6 +78,7 @@ func Seat(c *gin.Context) {
 	claims, _ := c.Get("claims")
 	claimsValueElem := reflect.ValueOf(claims).Elem()
 	studentID := uint(claimsValueElem.FieldByName("ID").Uint())
+	studentName := claimsValueElem.FieldByName("Name").String()
 
 	// 查看学生是否在专注
 	if model.GetStudentStatus(studentID) == 1 {
@@ -102,7 +103,7 @@ func Seat(c *gin.Context) {
 		return
 	}
 
-	if ok := model.UpdateSeat(studentID, uint(intClassroomID), seat); !ok {
+	if ok := model.UpdateSeat(uint(intClassroomID), studentName, seat); !ok {
 		response.Failed(c, "更新失败")
 		return
 	}
@@ -118,6 +119,7 @@ func Unseat(c *gin.Context) {
 	claims, _ := c.Get("claims")
 	claimsValueElem := reflect.ValueOf(claims).Elem()
 	studentID := uint(claimsValueElem.FieldByName("ID").Uint())
+	studentName := claimsValueElem.FieldByName("Name").String()
 
 	// 查看学生是否在专注
 	if model.GetStudentStatus(studentID) == 0 {
@@ -142,7 +144,7 @@ func Unseat(c *gin.Context) {
 		return
 	}
 
-	if ok := model.UpdateUnseat(studentID, uint(intClassroomID), seat); !ok {
+	if ok := model.UpdateUnseat(uint(intClassroomID), studentName, seat); !ok {
 		response.Failed(c, "更新失败")
 		return
 	}

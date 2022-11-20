@@ -115,14 +115,14 @@ func GetStudentStatus(id uint) int8 {
 //
 // UpdateStudentStatus
 //  @Description: 更新学生状态
-//  @param id 学生ID
+//  @param name 学生昵称
 //  @param status 状态
 //  @return err
 //
-func UpdateStudentStatus(id uint, status int8) (err error) {
+func UpdateStudentStatus(name string, status int8) (err error) {
 	db := database.GetMysqlDBInstance()
 	var student Student
-	err = db.Model(&student).Where("id = ?", id).Update("status", status).Error
+	err = db.Model(&student).Where("name = ?", name).Update("status", status).Error
 	return
 }
 
