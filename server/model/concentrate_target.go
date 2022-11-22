@@ -59,10 +59,12 @@ func GetConcentrateTargetID(concentrateTarget *ConcentrateTarget) (uint, bool) {
 // AddConcentrateTarget
 //  @Description: 添加专注目标
 //  @param concentrateTarget 专注目标
+//  @return uint
 //
-func AddConcentrateTarget(concentrateTarget *ConcentrateTarget) {
+func AddConcentrateTarget(concentrateTarget *ConcentrateTarget) uint {
 	db := database.GetMysqlDBInstance()
 	db.Create(concentrateTarget)
+	return concentrateTarget.ID
 }
 
 //

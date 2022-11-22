@@ -66,8 +66,6 @@ func BeginConcentrate(c *gin.Context) {
 //  @param c 上下文
 //
 func QuitConcentrate(c *gin.Context) {
-	//  实现Redis的过期回调 或者依赖前端的结束调用（待-----------------------------------
-
 	claims, _ := c.Get("claims")
 	claimsValueElem := reflect.ValueOf(claims).Elem()
 	uintStudentID := uint(claimsValueElem.FieldByName("ID").Uint())

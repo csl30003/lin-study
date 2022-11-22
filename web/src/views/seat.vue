@@ -43,13 +43,102 @@
       <h2 v-else>{{ seatInfo.seat10 }}</h2>
     </div>
   </div>
+
+  <el-drawer
+      v-model="target"
+      title="请选择本次专注的目标和专注的时长"
+      direction="rtl"
+      size="40%"
+      :before-close="chooseTargetClose"
+  >
+    <h3>专注目标</h3>
+    <br>
+
+    <el-check-tag
+        v-for="tag in targetTags"
+        :key="tag"
+        size="large"
+        round
+        class="mx-1"
+        closable
+        :disable-transitions="false"
+        effect="dark"
+        :checked="tag.checked"
+        @click="choose(tag.id, tag.checked)"
+    >
+      {{ tag.target }}
+    </el-check-tag>
+
+    <el-input
+        v-if="addInputVisible"
+        ref="addInputRef"
+        v-model="addInputValue"
+        class="ml-1 w-20"
+        size="large"
+        @keyup.enter="addTarget"
+        @blur="addTarget"
+    />
+    <el-button v-else class="button-new-tag ml-1" type="success" size="default" @click="addShowInput">
+      + 添加专注目标
+    </el-button>
+
+    <el-input
+        v-if="deleteInputVisible"
+        ref="deleteInputRef"
+        v-model="deleteInputValue"
+        class="ml-1 w-20"
+        size="large"
+        @keyup.enter="deleteTarget"
+        @blur="deleteTarget"
+    />
+    <el-button v-else class="button-new-tag ml-1" type="danger" size="default" @click="deleteShowInput">
+      + 删除专注目标
+    </el-button>
+
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+
+    <h3>专注时长(分钟)</h3>
+    <br>
+
+    <el-input
+        v-model="concentrateTime"
+        size="large"
+        style="width: 50%"
+    />
+    <br>
+    <br>
+    <el-button type="primary" @click="beginConcentrate">开始专注！！！</el-button>
+  </el-drawer>
+
+  <el-dialog
+      v-model="centerDialogVisible"
+      title="离开"
+      width="30%"
+      align-center
+  >
+    <span>确定要打退堂鼓吗？现在离开的话，是没有专注记录的喔！</span>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="manualUnseat">
+          还是离开
+        </el-button>
+        <el-button type="primary" @click="centerDialogVisible = false">
+          继续学习
+        </el-button>
+      </span>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup>
 
-import {onMounted, reactive, ref} from "vue";
+import {nextTick, onMounted, onUnmounted, reactive, ref} from "vue";
 import instance from "@/axios";
-import {ElMessage} from "element-plus";
+import {ElMessage, ElButton, ElDrawer, ElInput} from "element-plus";
 import {useRouter} from "vue-router";
 import axios from "axios";
 
@@ -77,10 +166,31 @@ const seatInfo = reactive({
   seat10: '',
 })
 
+//  为了给离座方法传参
+const seatTemp = ref(0)
+
+const target = ref(false)
+const addInputValue = ref('')
+const targetTags = ref([])
+const addInputVisible = ref(false)
+const addInputRef = ref()
+const chooseTargetID = ref(0)
+const concentrateTime = ref('')
+const deleteInputVisible = ref(false)
+const deleteInputValue = ref('')
+const deleteInputRef = ref()
+
+const centerDialogVisible = ref(false)
+
 onMounted(() => {
   getStudent()
   getClassroomID()
   getSeatInfo()
+  getConcentrateTarget()
+})
+
+onUnmounted(() => {
+  unseatButNoMessage(student.name, seatTemp.value)
 })
 
 const getStudent = async () => {
@@ -124,6 +234,23 @@ const getSeatInfo = async () => {
   })
 }
 
+const getConcentrateTarget = async () => {
+  targetTags.value = []
+  instance.get('http://localhost:8080/index/concentrateTarget').then(res => {
+    if (res.data.code === 200) {
+      for (const datum of res.data.data) {
+        targetTags.value.push({
+          id: datum.id,
+          target: datum.target,
+          checked: false
+        })
+      }
+    } else {
+      ElMessage.error('无法获取你的好友')
+    }
+  })
+}
+
 const seat = async (name, seat) => {
 //  判断有没有人，没人就入座，有人就判断是不是自己，是就离座，不是就查看对方的信息
 //  可以用element plus的抽屉做选择专注目标
@@ -141,20 +268,181 @@ const seat = async (name, seat) => {
     formData.append('seat', seat.toString())
     formData.append('classroom_id', classroomID.value.toString())
 
+    seatTemp.value = seat
+
     instanceXWWWForm.patch('http://localhost:8080/index/classroom/seat', formData).then(async res => {
       if (res.data.code === 200) {
         await getSeatInfo()
+
+        //  开始选择专注目标
+        target.value = true
       } else {
         ElMessage.error(res.data.message)
       }
     })
   } else if (name === student.name) {
     //  离座
+    centerDialogVisible.value = true
   } else {
     //  查看对方的信息
   }
 }
 
+const unseat = async (name, seat) => {
+  //  离座
+  const instanceXWWWForm = axios.create({
+    timeout: 6000,
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    withCredentials: true
+  })
+
+  let formData = new FormData()
+  formData.append('seat', seat.toString())
+  formData.append('classroom_id', classroomID.value.toString())
+
+  seatTemp.value = 0
+  console.log(seat.toString(), classroomID.value.toString())
+
+  instanceXWWWForm.patch('http://localhost:8080/index/classroom/unseat', formData).then(async res => {
+    if (res.data.code === 200) {
+      await getSeatInfo()
+      ElMessage.success('已离开座位')
+    } else {
+      ElMessage.error(res.data.message)
+    }
+  })
+}
+
+const unseatButNoMessage = async (name, seat) => {
+  //  离座但是没有消息反馈
+  const instanceXWWWForm = axios.create({
+    timeout: 6000,
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    withCredentials: true
+  })
+
+  let formData = new FormData()
+  formData.append('seat', seat.toString())
+  formData.append('classroom_id', classroomID.value.toString())
+
+  seatTemp.value = 0
+  console.log(seat.toString(), classroomID.value.toString())
+
+  instanceXWWWForm.patch('http://localhost:8080/index/classroom/unseat', formData).then(async res => {
+    if (res.data.code === 200) {
+      await getSeatInfo()
+    }
+  })
+}
+
+const manualUnseat = async () => {
+  //  手动离座
+  centerDialogVisible.value = false
+  await unseat(student.name, seatTemp.value)
+}
+
+const chooseTargetClose = async () => {
+  target.value = false
+  await unseat(student.name, seatTemp.value)
+}
+
+const deleteShowInput = async () => {
+  deleteInputVisible.value = true
+  await nextTick(() => {
+    deleteInputRef.value.input.focus()
+  })
+}
+
+const deleteTarget = async () => {
+  if (deleteInputValue.value) {
+    //  删除专注目标
+    let tag = deleteInputValue.value
+
+    instance.delete('http://localhost:8080/index/concentrateTarget', {
+      data: {
+        target: deleteInputValue.value
+      }
+    }).then(res => {
+      if (res.data.code === 200) {
+        ElMessage({
+          message: res.data.message,
+          type: 'success',
+        })
+
+        let id1 = targetTags.value.findIndex(item => {
+          if (item.target === tag) {
+            return true
+          }
+        })
+
+        targetTags.value.splice(id1, 1)
+      } else {
+        ElMessage.error(res.data.message)
+      }
+    })
+  }
+  deleteInputVisible.value = false
+  deleteInputValue.value = ''
+}
+
+const addShowInput = async () => {
+  addInputVisible.value = true
+  await nextTick(() => {
+    addInputRef.value.input.focus()
+  })
+}
+
+const addTarget = async () => {
+  if (addInputValue.value) {
+    //  添加专注目标
+    //  我不知道为什么post之后inputValue.value值就没了，离谱
+    let tag = addInputValue.value
+
+    instance.post('http://localhost:8080/index/concentrateTarget', {
+      target: addInputValue.value
+    }).then(res => {
+      if (res.data.code === 200) {
+        ElMessage({
+          message: res.data.message,
+          type: 'success',
+        })
+
+        targetTags.value.push({
+          id: res.data.data,
+          target: tag,
+          checked: false
+        })
+      } else {
+        ElMessage.error(res.data.message)
+      }
+    })
+  }
+  addInputVisible.value = false
+  addInputValue.value = ''
+}
+
+const choose = async (id, checked) => {
+  for (const tag of targetTags.value) {
+    if (tag.id !== id) {
+      tag.checked = false
+    } else {
+      tag.checked = !checked
+      if (tag.checked === true) {
+        chooseTargetID.value = id
+      } else {
+        chooseTargetID.value = 0
+      }
+    }
+  }
+}
+
+const beginConcentrate = () => {
+  ElMessage.success(chooseTargetID.value + "  " + concentrateTime.value)
+}
 </script>
 
 <style scoped>
@@ -274,5 +562,13 @@ h2 {
   width: 10%;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 1);
   text-align: center;
+}
+
+.mx-1 {
+  margin-right: 8px;
+}
+
+.dialog-footer button:first-child {
+  margin-right: 10px;
 }
 </style>

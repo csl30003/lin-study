@@ -50,8 +50,8 @@ func AddConcentrateTarget(c *gin.Context) {
 		return
 	}
 
-	model.AddConcentrateTarget(&concentrateTarget)
-	response.Success(c, "添加成功", nil)
+	concentrateTargetID := model.AddConcentrateTarget(&concentrateTarget)
+	response.Success(c, "添加成功", concentrateTargetID)
 }
 
 //
