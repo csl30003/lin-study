@@ -57,6 +57,8 @@ func BeginConcentrate(c *gin.Context) {
 	//  Redis setex student_id concentrate_time+3h ing
 	db.Set(common.RedisKeyStudentID+strStudentID, "ing", time.Duration(concentrate.ConcentrateTime)*time.Minute+3*time.Hour)
 
+	//  开一个计时器 结束时参试退出专注 或者结束专注
+
 	response.Success(c, "成功进入专注状态", nil)
 }
 
@@ -107,16 +109,17 @@ func EndConcentrate(c *gin.Context) {
 	db := database.GetRedisDBInstance()
 	val, _ := db.Get(common.RedisKeyStudentID + strStudentID).Result()
 	ttl := db.TTL(common.RedisKeyStudentID + strStudentID).Val().Minutes()
-	if val == "0" && ttl > 0 && ttl < 180 {
+	//  ttl < 179 留一分钟是为了容错
+	if val == "ing" && ttl > 0 && ttl < 179 {
 		//  顺利结束专注
 		if err := model.UpdateConcentrateStatus(uintStudentID); err != nil {
 			response.Failed(c, "学生当前没有正在专注")
 			return
 		}
 		db.Del(common.RedisKeyStudentID + strStudentID)
-		response.Success(c, "顺利结束专注状态", nil)
-
 		//  累加学生总专注时长（待--------------------------------------------------------------
+
+		response.Success(c, "顺利结束专注状态", nil)
 	} else {
 		//  提前结束 即QuitConcentrate()
 		var concentrate model.Concentrate

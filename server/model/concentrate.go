@@ -26,8 +26,7 @@ type Concentrate struct {
 func ExistConcentrateAndStatusIsZero(studentID uint) bool {
 	db := database.GetMysqlDBInstance()
 	var concentrate Concentrate
-	db.Where("student_id = ?", studentID).First(&concentrate)
-	if concentrate.Status == 0 {
+	if err := db.Where("student_id = ? and status = 0", studentID).First(&concentrate).Error; err == nil {
 		return true
 	}
 	return false

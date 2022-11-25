@@ -1,7 +1,7 @@
 <template>
-  <el-image :src="require('@/assets/seat.png')"
-            style="margin: 0; position:absolute; height: 100%; width: 92%;"></el-image>
-  <div class="div">
+  <div class="div" @mouseleave="concentrateOut">
+    <el-image :src="require('@/assets/seat.png')"
+              style="margin: 0; position:absolute; height: 100%; width: 92%;"></el-image>
     <div id="seat1" @click="seat(seatInfo.seat1, 1)">
       <h2 v-if="seatInfo.seat1 === '_'"></h2>
       <h2 v-else>{{ seatInfo.seat1 }}</h2>
@@ -42,105 +42,161 @@
       <h2 v-if="seatInfo.seat10 === '_'"></h2>
       <h2 v-else>{{ seatInfo.seat10 }}</h2>
     </div>
-  </div>
 
-  <el-drawer
-      v-model="target"
-      title="请选择本次专注的目标和专注的时长"
-      direction="rtl"
-      size="40%"
-      :before-close="chooseTargetClose"
-  >
-    <h3>专注目标</h3>
-    <br>
+    <div id="time" class="time">
+      <el-icon size="large">
+        <Timer/>
+      </el-icon>
+      <h3>倒计时: {{ min }}分钟 {{ sec }}秒</h3>
+    </div>
 
-    <el-check-tag
-        v-for="tag in targetTags"
-        :key="tag"
-        size="large"
-        round
-        class="mx-1"
-        closable
-        :disable-transitions="false"
-        effect="dark"
-        :checked="tag.checked"
-        @click="choose(tag.id, tag.checked)"
+    <el-drawer
+        v-model="target"
+        title="请选择本次专注的目标和专注的时长"
+        direction="rtl"
+        size="40%"
+        :before-close="chooseTargetClose"
     >
-      {{ tag.target }}
-    </el-check-tag>
+      <h3>专注目标</h3>
+      <br>
 
-    <el-input
-        v-if="addInputVisible"
-        ref="addInputRef"
-        v-model="addInputValue"
-        class="ml-1 w-20"
-        size="large"
-        @keyup.enter="addTarget"
-        @blur="addTarget"
-    />
-    <el-button v-else class="button-new-tag ml-1" type="success" size="default" @click="addShowInput">
-      + 添加专注目标
-    </el-button>
+      <el-check-tag
+          v-for="tag in targetTags"
+          :key="tag"
+          size="large"
+          round
+          class="mx-1"
+          closable
+          :disable-transitions="false"
+          effect="dark"
+          :checked="tag.checked"
+          @click="choose(tag.id, tag.checked)"
+      >
+        {{ tag.target }}
+      </el-check-tag>
 
-    <el-input
-        v-if="deleteInputVisible"
-        ref="deleteInputRef"
-        v-model="deleteInputValue"
-        class="ml-1 w-20"
-        size="large"
-        @keyup.enter="deleteTarget"
-        @blur="deleteTarget"
-    />
-    <el-button v-else class="button-new-tag ml-1" type="danger" size="default" @click="deleteShowInput">
-      + 删除专注目标
-    </el-button>
+      <el-input
+          v-if="addInputVisible"
+          ref="addInputRef"
+          v-model="addInputValue"
+          class="ml-1 w-20"
+          size="large"
+          @keyup.enter="addTarget"
+          @blur="addTarget"
+      />
+      <el-button v-else class="button-new-tag ml-1" type="success" size="default" @click="addShowInput">
+        + 添加专注目标
+      </el-button>
 
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
+      <el-input
+          v-if="deleteInputVisible"
+          ref="deleteInputRef"
+          v-model="deleteInputValue"
+          class="ml-1 w-20"
+          size="large"
+          @keyup.enter="deleteTarget"
+          @blur="deleteTarget"
+      />
+      <el-button v-else class="button-new-tag ml-1" type="danger" size="default" @click="deleteShowInput">
+        + 删除专注目标
+      </el-button>
 
-    <h3>专注时长(分钟)</h3>
-    <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
 
-    <el-input
-        v-model="concentrateTime"
-        size="large"
-        style="width: 50%"
-    />
-    <br>
-    <br>
-    <el-button type="primary" @click="beginConcentrate">开始专注！！！</el-button>
-  </el-drawer>
+      <h3>专注时长(分钟)</h3>
+      <br>
 
-  <el-dialog
-      v-model="centerDialogVisible"
-      title="离开"
-      width="30%"
-      align-center
-  >
-    <span>确定要打退堂鼓吗？现在离开的话，是没有专注记录的喔！</span>
-    <template #footer>
+      <el-input
+          v-model="concentrateTime"
+          size="large"
+          style="width: 50%"
+      />
+      <br>
+      <br>
+      <el-button type="primary" @click="beginConcentrate">开始专注！！！</el-button>
+    </el-drawer>
+
+    <el-dialog
+        v-model="centerDialogVisible"
+        title="请做出你的选择"
+        width="30%"
+        align-center
+    >
+      <span>{{ student.name }}同学想做些什么呢？</span>
+      <template #footer>
       <span class="dialog-footer">
         <el-button @click="manualUnseat">
-          还是离开
+          离开
         </el-button>
         <el-button type="primary" @click="centerDialogVisible = false">
-          继续学习
+          休息 休息一下
+        </el-button>
+        <el-button type="success" @click="centerDialogVisible = false;target = true">
+          开始专注
         </el-button>
       </span>
-    </template>
-  </el-dialog>
+      </template>
+    </el-dialog>
+
+    <el-dialog
+        v-model="concentrateOverVisible"
+        title="太棒啦"
+        width="30%"
+        align-center
+    >
+      <span>恭喜你完成本次专注！</span>
+      <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="manualUnseat">
+          我想回家了
+        </el-button>
+        <el-button type="primary" @click="concentrateOverVisible = false">
+          小休一下
+        </el-button>
+        <el-button type="success" @click="concentrateOverVisible = false;target = true">
+          继续狠狠专注
+        </el-button>
+      </span>
+      </template>
+    </el-dialog>
+
+    <el-dialog v-model="outVisible" :show-close="false" :close-on-click-modal="false">
+      <template #header="{ titleId, titleClass }">
+        <div class="out-header">
+          <h4 :id="titleId" :class="titleClass">遛号啦！！！！！！！！</h4>
+          <el-button type="success" @click="concentrateBack">
+            <el-icon size="large">
+              <Position/>
+            </el-icon>
+            我回来了
+          </el-button>
+        </div>
+      </template>
+      <el-icon size="large">
+        <Stopwatch/>
+      </el-icon>
+      三十秒内没回来专注记录就没有啦！QAQ
+      <h3>倒计时: {{ outSec }}秒</h3>
+    </el-dialog>
+  </div>
 </template>
 
 <script setup>
 
 import {nextTick, onMounted, onUnmounted, reactive, ref} from "vue";
 import instance from "@/axios";
-import {ElMessage, ElButton, ElDrawer, ElInput} from "element-plus";
+import {ElMessage, ElButton, ElDrawer, ElInput, ElNotification} from "element-plus";
 import {useRouter} from "vue-router";
 import axios from "axios";
+import {
+  Timer,
+  Stopwatch,
+  Position,
+} from '@element-plus/icons-vue'
 
 let student = reactive({
   id: '',
@@ -181,6 +237,18 @@ const deleteInputValue = ref('')
 const deleteInputRef = ref()
 
 const centerDialogVisible = ref(false)
+const concentrateOverVisible = ref(false)
+
+const outVisible = ref(false)
+
+const min = ref('_')
+const sec = ref('_')
+//以下两个时间变量是为了遛号保存时间服务的
+const minTemp = ref('_')
+const secTemp = ref('_')
+//outSec是为了遛号倒计时
+const outSec = ref('_')
+
 
 onMounted(() => {
   getStudent()
@@ -281,7 +349,6 @@ const seat = async (name, seat) => {
       }
     })
   } else if (name === student.name) {
-    //  离座
     centerDialogVisible.value = true
   } else {
     //  查看对方的信息
@@ -303,7 +370,6 @@ const unseat = async (name, seat) => {
   formData.append('classroom_id', classroomID.value.toString())
 
   seatTemp.value = 0
-  console.log(seat.toString(), classroomID.value.toString())
 
   instanceXWWWForm.patch('http://localhost:8080/index/classroom/unseat', formData).then(async res => {
     if (res.data.code === 200) {
@@ -313,6 +379,8 @@ const unseat = async (name, seat) => {
       ElMessage.error(res.data.message)
     }
   })
+
+  await quitConcentrate()
 }
 
 const unseatButNoMessage = async (name, seat) => {
@@ -330,18 +398,20 @@ const unseatButNoMessage = async (name, seat) => {
   formData.append('classroom_id', classroomID.value.toString())
 
   seatTemp.value = 0
-  console.log(seat.toString(), classroomID.value.toString())
 
   instanceXWWWForm.patch('http://localhost:8080/index/classroom/unseat', formData).then(async res => {
     if (res.data.code === 200) {
       await getSeatInfo()
     }
   })
+
+  await quitConcentrate()
 }
 
 const manualUnseat = async () => {
   //  手动离座
   centerDialogVisible.value = false
+  concentrateOverVisible.value = false
   await unseat(student.name, seatTemp.value)
 }
 
@@ -440,9 +510,190 @@ const choose = async (id, checked) => {
   }
 }
 
-const beginConcentrate = () => {
-  ElMessage.success(chooseTargetID.value + "  " + concentrateTime.value)
+const beginConcentrate = async () => {
+  if (chooseTargetID.value === 0) {
+    ElMessage.warning('还没有选择专注目标呢！')
+  } else {
+    let concentrateTimeTemp
+    try {
+      concentrateTimeTemp = parseInt(concentrateTime.value)
+    } catch (e) {
+      ElMessage.warning('没有输入正确的专注时长！')
+      return
+    }
+
+    instance.post('http://localhost:8080/index/classroom/concentrate', {
+      concentrate_target_id: chooseTargetID.value,
+      concentrate_time: concentrateTimeTemp,
+    }).then(async res => {
+      if (res.data.code === 200) {
+        ElMessage.success(res.data.message)
+        // 计时器
+        min.value = '0'
+        sec.value = '0'
+        await countDown(concentrateTimeTemp * 60)
+      } else {
+        ElMessage.error(res.data.message)
+      }
+    })
+
+    target.value = false
+  }
 }
+
+const quitConcentrate = async () => {
+  if (chooseTargetID.value !== 0) {
+    instance.delete('http://localhost:8080/index/classroom/concentrate').then(res => {
+      if (res.data.code === 200) {
+        ElMessage({
+          message: res.data.message,
+          type: 'success',
+        })
+      } else {
+        ElMessage.error(res.data.message)
+      }
+    })
+    min.value = '_'
+    sec.value = '_'
+  }
+}
+
+const endConcentrate = async () => {
+  if (chooseTargetID.value !== 0) {
+    instance.patch('http://localhost:8080/index/classroom/concentrate').then(res => {
+      if (res.data.code === 200) {
+        ElMessage({
+          message: res.data.message,
+          type: 'success',
+        })
+      } else {
+        ElMessage.error(res.data.message)
+      }
+    })
+    min.value = '_'
+    sec.value = '_'
+  }
+}
+
+//倒计时
+const countDown = async (msec) => {
+  if (msec < 0) {
+    return
+  }
+  if (min.value === '_' && sec.value === '_') {
+    //强退
+    await quitConcentrate()
+    return
+  }
+
+  if (min.value === 'out' && sec.value === 'out') {
+    //遛号中
+    return
+  }
+
+  let minInt = parseInt(msec / 60 % 60)
+  let secInt = parseInt(msec % 60)
+  min.value = minInt.toString()
+  sec.value = secInt > 9 ? secInt : '0' + secInt
+  if (minInt >= 0 && secInt >= 0) {
+    if (minInt === 0 && secInt === 0) {
+      //倒计时结束
+      await endConcentrate()
+
+      //弹窗
+      concentrateOverVisible.value = true
+      return
+    }
+    setTimeout(function () {
+      countDown(msec - 1)
+    }, 1000)
+  }
+}
+
+const concentrateOut = async () => {
+  if (min.value !== '_' && sec.value !== '_') {
+    //正在专注但却遛号
+    instance.patch('http://localhost:8080/index/classroom/concentrateOut').then(async res => {
+      if (res.data.code === 200) {
+        ElMessage.success(res.data.message)
+        outVisible.value = true
+
+        minTemp.value = min.value
+        secTemp.value = sec.value
+        min.value = 'out'
+        sec.value = 'out'
+
+        //启动30秒倒计时
+        outSec.value = '30'
+        await outCountDown(30)
+      } else {
+        ElMessage.error(res.data.message)
+      }
+    })
+  }
+}
+
+const outCountDown = async (msec) => {
+  if (msec < 0) {
+    outSec.value = '_'
+    return
+  }
+  if (outSec.value === '_') {
+    //已恢复
+    return
+  }
+
+  let outSecInt = parseInt(msec)
+  outSec.value = outSecInt.toString()
+  if (outSecInt >= 0) {
+    if (outSecInt === 0) {
+      //倒计时结束 成功遛号
+      await quitConcentrate()
+
+      outVisible.value = false
+      outSec.value = '_'
+
+      ElNotification({
+        title: '遛号啦',
+        message: '专注失败惹 记录也被抹去 下次一定要认真哦😫',
+        duration: 0,
+      })
+      return
+    }
+    setTimeout(function () {
+      outCountDown(msec - 1)
+    }, 1000)
+  }
+}
+
+const concentrateBack = async () => {
+  //正在遛号但却改过自新
+  if (min.value === 'out' && sec.value === 'out' && outSec.value !== '_') {
+    instance.patch('http://localhost:8080/index/classroom/concentrateBack').then(async res => {
+      if (res.data.code === 200) {
+        ElMessage.success(res.data.message)
+        min.value = minTemp.value
+        sec.value = secTemp.value
+        minTemp.value = '_'
+        secTemp.value = '_'
+        outSec.value = '_'
+        outVisible.value = false
+
+        ElNotification({
+          title: '回来辣',
+          message: '要专心致志学习哦！',
+        })
+
+        let minInt = parseInt(min.value)
+        let secInt = parseInt(sec.value)
+        await countDown(minInt * 60 + secInt)
+      } else {
+        ElMessage.error(res.data.message)
+      }
+    })
+  }
+}
+
 </script>
 
 <style scoped>
@@ -564,11 +815,27 @@ h2 {
   text-align: center;
 }
 
+#time {
+  position: absolute;
+  top: 44%;
+  left: 39%;
+  height: 10%;
+  width: 30%;
+  /*box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 1);*/
+  text-align: center;
+}
+
 .mx-1 {
   margin-right: 8px;
 }
 
 .dialog-footer button:first-child {
   margin-right: 10px;
+}
+
+.out-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 </style>
