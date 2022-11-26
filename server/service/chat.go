@@ -40,7 +40,7 @@ func SendMessage(c *gin.Context) {
 		return
 	}
 
-	//  RSA解密
+	//  RSA解密 为了实现网络安全大作业加的
 	plainText, err := tool.RSADecrypt(cipherText, tool.PrivateKeyStr)
 	if err != nil {
 		response.Failed(c, "解密失败")
@@ -79,7 +79,7 @@ func GetChat(c *gin.Context) {
 		return
 	}
 
-	//  加密
+	//  加密 为了实现网络安全大作业加的
 	for i := range chatSlice {
 		chatContentTemp, err := tool.RSAEncrypt([]byte(chatSlice[i].ChatContent), jsonObj.PublicKey)
 		if err != nil {

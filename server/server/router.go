@@ -75,6 +75,13 @@ func Start() {
 
 		i.GET("/searchStudent", service.SearchStudent)
 		i.GET("/student", service.GetStudent)
+
+		i.POST("/diary", service.KeepDiary)
+		i.DELETE("/diary", service.EraseTheDiary)
+		i.GET("/diary", service.ReadDiary)
+		i.PATCH("/diary", service.ChangeDiary)
+		i.PATCH("/likeDiary", service.LikeDiary)
+		i.PATCH("/unlikeDiary", service.UnlikeDiary)
 	}
 
 	err := e.Run(":8080")

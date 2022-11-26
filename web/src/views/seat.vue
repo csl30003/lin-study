@@ -821,7 +821,6 @@ h2 {
   left: 39%;
   height: 10%;
   width: 30%;
-  /*box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 1);*/
   text-align: center;
 }
 
