@@ -82,6 +82,8 @@ func Start() {
 		i.PATCH("/diary", service.ChangeDiary)
 		i.PATCH("/likeDiary", service.LikeDiary)
 		i.PATCH("/unlikeDiary", service.UnlikeDiary)
+
+		i.GET("/notice", service.GetNotice)
 	}
 
 	err := e.Run(":8080")
