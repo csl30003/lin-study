@@ -36,7 +36,7 @@
             <template #title>通知</template>
           </el-menu-item>
 
-          <el-menu-item index="6">
+          <el-menu-item index="6" @click="me">
             <el-icon><User /></el-icon>
             <template #title>个人</template>
           </el-menu-item>

@@ -84,7 +84,7 @@
             </div>
           </template>
           <el-button type="primary" @click="deepenUnderstanding(friend.id)">深入了解</el-button>
-          <el-button type="info">传递纸条</el-button>
+          <el-button type="info" @click="chat">传递纸条</el-button>
           <el-button type="danger" @click="breakOffRelations(friend.id)">狠心绝交</el-button>
         </el-descriptions-item>
       </el-descriptions>
@@ -524,6 +524,10 @@ const breakOffRelations = async (id) => {
   })
   await router.push('/home/map')
   await router.push('/home/friend')
+}
+
+const chat = async () => {
+  await router.push('/home/chat')
 }
 </script>
 

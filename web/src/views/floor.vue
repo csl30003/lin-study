@@ -3,7 +3,7 @@
             style="margin: 0; position:relative; height: 100%; width: 100%"></el-image>
 
   <div class="radius" @click="getLayer('大学部')">
-
+    <h1>大学部</h1>
   </div>
 
 
