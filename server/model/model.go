@@ -2,8 +2,6 @@ package model
 
 import (
 	"gorm.io/gorm"
-	"log"
-	"server/database"
 	"time"
 )
 
@@ -22,21 +20,21 @@ type Model struct {
 // init
 //  @Description: 初始化MySQL数据库表
 //
-func init() {
-	db := database.GetMysqlDBInstance()
-	err := db.AutoMigrate(
-		&Student{},
-		&Diary{},
-		&Friend{},
-		&Notice{},
-		&Chat{},
-		&ConcentrateTarget{},
-		&Concentrate{},
-		&Classroom{},
-		&CollectClassroom{},
-	)
-	if err != nil {
-		log.Fatal("MySQL表初始化失败", err)
-		return
-	}
-}
+//func init() {
+//	db := database.GetMysqlDBInstance()
+//	err := db.AutoMigrate(
+//		&Student{},
+//		&Diary{},
+//		&Friend{},
+//		&Notice{},
+//		&Chat{},
+//		&ConcentrateTarget{},
+//		&Concentrate{},
+//		&Classroom{},
+//		&CollectClassroom{},
+//	)
+//	if err != nil {
+//		log.Fatal("MySQL表初始化失败", err)
+//		return
+//	}
+//}
