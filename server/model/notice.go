@@ -17,3 +17,9 @@ func AddNotice(notice *Notice) {
 	db := database.GetMysqlDBInstance()
 	db.Create(notice)
 }
+
+func GetNoticeByStudentID(studentID uint) (notice []Notice) {
+	db := database.GetMysqlDBInstance()
+	db.Where("student_id = ?", studentID).Order("id desc").Find(&notice)
+	return
+}

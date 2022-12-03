@@ -58,7 +58,7 @@ func DeleteDiary(diary *Diary) {
 //
 func GetDiaryByStudentID(studentID uint) (diary []Diary) {
 	db := database.GetMysqlDBInstance()
-	db.Where("student_id = ?", studentID).Find(&diary)
+	db.Where("student_id = ?", studentID).Order("id desc").Find(&diary)
 	return
 }
 

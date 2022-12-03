@@ -103,6 +103,22 @@ func ExistFriend(studentID, objectID uint) bool {
 }
 
 //
+// ExistFriendAndIsMutual
+//  @Description: 是否为双向好友
+//  @param studentID 学生ID
+//  @param objectID 对方ID
+//  @return bool
+//
+func ExistFriendAndIsMutual(studentID, objectID uint) bool {
+	db := database.GetMysqlDBInstance()
+	var friend Friend
+	if err := db.Where("student_id = ? and object_id = ? and is_mutual = 1", studentID, objectID).First(&friend).Error; err != nil {
+		return false
+	}
+	return true
+}
+
+//
 // AddFriend
 //  @Description: 添加朋友
 //  @param friend 朋友
