@@ -7,6 +7,7 @@ import (
 	"server/database"
 	"server/model"
 	"server/response"
+	"server/tool"
 	"strconv"
 	"time"
 )
@@ -110,14 +111,27 @@ func EndConcentrate(c *gin.Context) {
 	val, _ := db.Get(common.RedisKeyStudentID + strStudentID).Result()
 	ttl := db.TTL(common.RedisKeyStudentID + strStudentID).Val().Minutes()
 	//  ttl < 179 留一分钟是为了容错
-	if val == "ing" && ttl > 0 && ttl < 179 {
+	if val == "ing" && ttl > 0 && ttl < 181 {
 		//  顺利结束专注
-		if err := model.UpdateConcentrateStatus(uintStudentID); err != nil {
+		concentrate, ok := model.GetConcentrateByStudentIDAndStatus(uintStudentID, 0)
+		if !ok {
+			response.Failed(c, "专注记录不存在")
+			return
+		}
+
+		err := model.UpdateConcentrateStatus(concentrate)
+		if err != nil {
 			response.Failed(c, "学生当前没有正在专注")
 			return
 		}
+
 		db.Del(common.RedisKeyStudentID + strStudentID)
-		//  累加学生总专注时长（待--------------------------------------------------------------
+
+		//  累加学生总专注时长
+		err = model.UpdateStudentAccumulatedConcentrateTime(uintStudentID, concentrate.ConcentrateTime)
+		if err != nil {
+			tool.RabbitMQSimpleLogger.PublishSimpleLogger(tool.ERROR, "累加学生专注时长失败 请管理员手动累加 "+strconv.Itoa(int(concentrate.StudentId))+" "+string(concentrate.ConcentrateTime)+" "+err.Error())
+		}
 
 		response.Success(c, "顺利结束专注状态", nil)
 	} else {

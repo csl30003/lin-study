@@ -48,6 +48,23 @@ func GetConcentrateID(concentrate *Concentrate) (uint, bool) {
 }
 
 //
+// GetConcentrateByStudentIDAndStatus
+//  @Description: 通过学生ID和状态获取专注
+//  @param studentID 学生ID
+//  @param status 状态
+//  @return Concentrate
+//  @return bool
+//
+func GetConcentrateByStudentIDAndStatus(studentID uint, status int8) (Concentrate, bool) {
+	db := database.GetMysqlDBInstance()
+	var concentrate Concentrate
+	if err := db.Where("student_id = ? and status = ?", studentID, status).First(&concentrate).Error; err != nil {
+		return concentrate, false
+	}
+	return concentrate, true
+}
+
+//
 // AddConcentrate
 //  @Description: 添加专注
 //  @param concentrate 专注
@@ -67,15 +84,23 @@ func DeleteConcentrate(concentrate *Concentrate) {
 	db.Delete(&concentrate)
 }
 
-func UpdateConcentrateStatus(studentID uint) (err error) {
+//
+// UpdateConcentrateStatus
+//  @Description: 更新专注状态
+//  @param concentrate 专注
+//  @return int32
+//  @return error
+//
+func UpdateConcentrateStatus(concentrate Concentrate) error {
 	db := database.GetMysqlDBInstance()
-	var concentrate Concentrate
-	result := db.Model(&concentrate).Where("student_id = ? and status = 0", studentID).Update("status", 1)
+	result := db.Model(&concentrate).Update("status", 1)
 	if result.RowsAffected == 0 {
-		err = errors.New("update: no updated row")
+		err := errors.New("update: no updated row")
+		return err
 	}
 	if result.Error != nil {
-		err = result.Error
+		err := result.Error
+		return err
 	}
-	return
+	return nil
 }
