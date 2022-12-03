@@ -109,7 +109,6 @@ func GetStudentStatus(id uint) int8 {
 	db := database.GetMysqlDBInstance()
 	var student Student
 	db.Where("id = ?", id).First(&student)
-
 	return student.Status
 }
 
