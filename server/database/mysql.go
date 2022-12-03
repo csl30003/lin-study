@@ -46,7 +46,10 @@ func (m *Mysql) Conn() {
 	m.database = conf.Cfg.Section("MYSQL").Key("database").String()
 
 	//  连接MySQL
-	dsn := m.user + ":" + m.password + "@tcp(" + m.host + ":" + m.port + ")/" + m.database + "?charset=utf8mb4&parseTime=True&loc=UTC"
+	dsn := m.user + ":" + m.password + "@tcp(" + m.host + ":" + m.port + ")/" + m.database + "?charset=utf8mb4&parseTime=True&loc=Local"
+	//如果连接的是美国的服务器就用下面的dsn 不然时间会错
+	//dsn := m.user + ":" + m.password + "@tcp(" + m.host + ":" + m.port + ")/" + m.database + "?charset=utf8mb4&parseTime=True&loc=UTC"
+
 	m.db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal("MySQL初始化失败", err)

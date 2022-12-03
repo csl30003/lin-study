@@ -28,7 +28,7 @@ func KeepDiary(c *gin.Context) {
 	diary.Likes = 0
 
 	model.AddDiary(&diary)
-	response.Success(c, "成功提交日记", diary.ID)
+	response.Success(c, "成功提交日记", diary)
 }
 
 //

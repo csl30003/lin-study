@@ -26,12 +26,12 @@
             <template #title>纸条</template>
           </el-menu-item>
 
-          <el-menu-item index="4">
+          <el-menu-item index="4" @click="diary">
             <el-icon><Notebook /></el-icon>
             <template #title>日记</template>
           </el-menu-item>
 
-          <el-menu-item index="5">
+          <el-menu-item index="5" @click="notice">
             <el-icon><BellFilled /></el-icon>
             <template #title>通知</template>
           </el-menu-item>
@@ -109,6 +109,18 @@ const friend = async () => {
 
 const chat = async () => {
   await router.push('/home/chat')
+}
+
+const diary = async () => {
+  await router.push('/home/diary')
+}
+
+const notice = async () => {
+  await router.push('/home/notice')
+}
+
+const me = async () => {
+  await router.push('/home/me')
 }
 
 const logout = async () => {
