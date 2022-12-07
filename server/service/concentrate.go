@@ -105,7 +105,7 @@ func EndConcentrate(c *gin.Context) {
 	uintStudentID := uint(claimsValueElem.FieldByName("ID").Uint())
 	strStudentID := strconv.Itoa(int(uintStudentID))
 
-	//  if can get student_id and value == 0 and Redis ttl student_id < 3h then MySQL update and Redis del
+	//  if can get student_id and value == ing and Redis ttl student_id < 3h then MySQL update and Redis del
 	//  else then MySQL delete and Redis del
 	db := database.GetRedisDBInstance()
 	val, _ := db.Get(common.RedisKeyStudentID + strStudentID).Result()
